@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { API_BASE_URL } from '@/lib/api/client';
+import { telemetryApi } from '@/lib/api/telemetry';
+import { ApiError } from '@/lib/api/client';
 import { 
   UploadCloud, 
   FileText, 
@@ -62,29 +63,31 @@ export const PcapUploadCard: React.FC<PcapUploadCardProps> = ({ onUploadSuccess 
     setJobStatus(null);
   };
 
-  const pollJobStatus = async (jobId: string) => {
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
+  const pollJobStatus = (jobId: string) => {
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/telemetry/ingestion/${jobId}`);
-        if (res.ok) {
-          const data: PcapJobStatus = await res.json();
-          setJobStatus(data);
-          if (data.status === 'COMPLETED' || data.status === 'FAILED') {
-            clearInterval(interval);
-            setUploading(false);
-            if (data.status === 'COMPLETED' && onUploadSuccess) {
-              onUploadSuccess();
-            }
-          }
-        } else {
+        const data = await telemetryApi.getPcapStatus(jobId);
+        setJobStatus(data as any);
+        if (data.status === 'COMPLETED' || data.status === 'FAILED') {
           clearInterval(interval);
           setUploading(false);
-          setErrorMessage('Could not query ingestion job status.');
+          if (data.status === 'COMPLETED' && onUploadSuccess) {
+            onUploadSuccess();
+          }
+          if (data.status === 'FAILED') {
+            setErrorMessage(data.error_message || 'Packet parsing or flow reconstruction failed on the backend.');
+          }
         }
-      } catch (err) {
+      } catch (err: any) {
         clearInterval(interval);
         setUploading(false);
-        setErrorMessage('Network error while polling job status.');
+        setErrorMessage(err.message || 'Could not query ingestion job status.');
       }
     }, 1000);
   };
@@ -94,21 +97,8 @@ export const PcapUploadCard: React.FC<PcapUploadCardProps> = ({ onUploadSuccess 
     setUploading(true);
     setErrorMessage(null);
 
-    const formData = new FormData();
-    formData.append('file', selectedFile);
-
     try {
-      const res = await fetch(`${API_BASE_URL}/telemetry/pcap`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => ({}));
-        throw new Error(errJson.detail || 'Upload failed');
-      }
-
-      const uploadResp: PcapUploadResponse = await res.json();
+      const uploadResp = await telemetryApi.uploadPcap(selectedFile);
       setJobStatus({
         job_id: uploadResp.job_id,
         filename: uploadResp.filename,
@@ -126,7 +116,7 @@ export const PcapUploadCard: React.FC<PcapUploadCardProps> = ({ onUploadSuccess 
 
     } catch (err: any) {
       setUploading(false);
-      setErrorMessage(err.message || 'PCAP upload failed');
+      setErrorMessage(err.message || 'PCAP upload failed. Please verify file integrity.');
     }
   };
 
@@ -171,7 +161,7 @@ export const PcapUploadCard: React.FC<PcapUploadCardProps> = ({ onUploadSuccess 
         </p>
         <p className="text-xs text-slate-400 mt-1">
           {selectedFile
-            ? `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB • Ready for packet parsing`
+            ? `${formatFileSize(selectedFile.size)} • Ready for packet parsing`
             : 'Streams through Scapy packet engine & bidirectional flow reconstructor'}
         </p>
       </div>

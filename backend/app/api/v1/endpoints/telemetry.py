@@ -50,8 +50,9 @@ async def _save_flows_to_db(flows: List[FlowRecord], source_id: str, job_id: Opt
             db.add(batch)
 
             for flow in flows:
+                flow_id = flow.id if (flow.id and len(flow.id) <= 36) else str(uuid.uuid4())
                 db_flow = NetworkFlow(
-                    id=flow.id or str(uuid.uuid4()),
+                    id=flow_id,
                     timestamp=flow.timestamp,
                     source_ip=flow.source_ip,
                     destination_ip=flow.destination_ip,
@@ -66,7 +67,7 @@ async def _save_flows_to_db(flows: List[FlowRecord], source_id: str, job_id: Opt
                     tcp_flags=flow.tcp_flags or "",
                     connection_state=flow.connection_state or "UNKNOWN",
                     direction=flow.direction.value,
-                    metadata_payload=flow.metadata,
+                    metadata_payload=flow.metadata or {},
                 )
                 db.add(db_flow)
             
@@ -77,6 +78,7 @@ async def _save_flows_to_db(flows: List[FlowRecord], source_id: str, job_id: Opt
                     job_rec.valid_flow_count = len(flows)
                     job_rec.record_count = len(flows)
                     job_rec.completed_at = datetime.now(timezone.utc)
+                    job_rec.quality_summary = {"flows_persisted": len(flows)}
             
             await db.commit()
         except Exception as e:
@@ -282,6 +284,7 @@ async def upload_pcap_file(
         file_size_bytes=job.file_size_bytes,
         status="PROCESSING",
         started_at=datetime.now(timezone.utc),
+        quality_summary={},
     )
     db.add(db_job)
     await db.flush()

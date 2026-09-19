@@ -79,7 +79,7 @@ class TelemetryJobManager:
         if file_size > self.MAX_FILE_SIZE_BYTES:
             raise ValueError(f"File size ({file_size} bytes) exceeds limit of {self.MAX_FILE_SIZE_BYTES} bytes")
 
-        job_id = f"job-{uuid.uuid4()}"
+        job_id = str(uuid.uuid4())
         record = IngestionJobRecord(
             job_id=job_id,
             filename=safe_name,

@@ -362,27 +362,49 @@ export function RiskStateDashboard() {
           </div>
         </div>
 
-        {/* 5-Stage State Progression Track */}
-        <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 text-center text-xs font-mono">
-          {(['NORMAL', 'WATCH', 'SUSPICIOUS', 'ELEVATED', 'CRITICAL'] as const).map((st) => {
-            const isCurrent = currentState === st;
-            const meta = STATE_CONFIG[st];
-            return (
-              <div
-                key={st}
-                className={`p-2.5 rounded-xl border transition-all ${
-                  isCurrent
-                    ? `${meta.badge} ring-1 ring-white/20 shadow-glass-card font-bold`
-                    : 'bg-slate-900/30 border-white/[0.04] text-slate-500'
-                }`}
-              >
-                <div className="flex items-center justify-center gap-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isCurrent ? 'bg-current' : 'bg-slate-600'}`} />
-                  <span className="text-[11px] truncate font-medium">{st}</span>
+        {/* Autonomous 5-Stage State Progression Track (Derived System State) */}
+        <div className="mt-5 pt-4 border-t border-white/[0.04] space-y-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] font-mono text-slate-400">
+            <span className="text-slate-300 font-semibold uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+              Autonomous State Progression (Derived Engine Status)
+            </span>
+            <span className="text-[10px] text-slate-500">
+              Evaluated from calibrated probability & hysteresis damping • Read-only
+            </span>
+          </div>
+
+          <div
+            role="region"
+            aria-label="System Security State Progression"
+            aria-readonly="true"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 text-center text-xs font-mono select-none"
+          >
+            {(['NORMAL', 'WATCH', 'SUSPICIOUS', 'ELEVATED', 'CRITICAL'] as const).map((st) => {
+              const isCurrent = currentState === st;
+              const meta = STATE_CONFIG[st];
+              return (
+                <div
+                  key={st}
+                  aria-current={isCurrent ? 'true' : undefined}
+                  className={`p-2.5 rounded-xl border transition-all cursor-default ${
+                    isCurrent
+                      ? `${meta.badge} ring-1 ring-white/20 shadow-glass-card font-bold`
+                      : 'bg-slate-900/30 border-white/[0.04] text-slate-500 opacity-60 hover:opacity-80'
+                  }`}
+                  title={isCurrent ? `Current Active State: ${st}` : `Derived State: ${st} (Inactive)`}
+                >
+                  <div className="flex items-center justify-center gap-1.5">
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isCurrent ? 'bg-current animate-pulse' : 'bg-slate-600'}`} />
+                    <span className="text-[11px] truncate font-medium">{st}</span>
+                  </div>
+                  <span className="text-[9px] block mt-0.5 uppercase tracking-tight text-slate-400">
+                    {isCurrent ? '● Active' : 'Standby'}
+                  </span>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
