@@ -30,6 +30,21 @@ class Settings(BaseSettings):
     # Database Settings
     # Supports SQLite (dev default) or PostgreSQL via asyncpg
     DATABASE_URL: str = "sqlite+aiosqlite:///./foresight.db"
+
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def assemble_database_url(cls, v: str) -> str:
+        if not v:
+            return "sqlite+aiosqlite:///./foresight.db"
+        # Render / Heroku compatibility: convert postgres:// and postgresql:// to postgresql+asyncpg://
+        if v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif v.startswith("postgresql://"):
+            return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+        elif v.startswith("postgresql+") and not v.startswith("postgresql+asyncpg://"):
+            parts = v.split("://", 1)
+            return f"postgresql+asyncpg://{parts[1]}"
+        return v
     
     # CORS Origins (List of URLs or JSON array string)
     BACKEND_CORS_ORIGINS: Union[List[str], str] = [
