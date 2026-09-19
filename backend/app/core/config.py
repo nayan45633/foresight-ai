@@ -4,8 +4,8 @@ Loads environment variables, handles type casting, validation, and defaults.
 Never hardcodes secrets.
 """
 
-from typing import List, Union
-from pydantic import AnyHttpUrl, field_validator
+from typing import List, Optional, Union
+from pydantic import AnyHttpUrl, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -46,21 +46,37 @@ class Settings(BaseSettings):
             return f"postgresql+asyncpg://{parts[1]}"
         return v
     
-    # CORS Origins (List of URLs or JSON array string)
+    # Production Frontend Origin & CORS Settings
+    FRONTEND_ORIGIN: Optional[str] = "https://foresight-ai-three.vercel.app"
     BACKEND_CORS_ORIGINS: Union[List[str], str] = [
         "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "https://foresight-ai-three.vercel.app"
     ]
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
         if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
+            return [i.strip() for i in v.split(",") if i.strip()]
         elif isinstance(v, list):
             return v
         import json
         return json.loads(v)
+
+    @model_validator(mode="after")
+    def sync_cors_origins(self) -> "Settings":
+        origins = list(self.BACKEND_CORS_ORIGINS) if isinstance(self.BACKEND_CORS_ORIGINS, list) else [self.BACKEND_CORS_ORIGINS]
+        if self.FRONTEND_ORIGIN:
+            for raw_origin in self.FRONTEND_ORIGIN.split(","):
+                clean = raw_origin.strip()
+                if clean and clean not in origins and clean != "*":
+                    origins.append(clean)
+        for dev_origin in ["http://localhost:3000", "http://127.0.0.1:3000"]:
+            if dev_origin not in origins:
+                origins.append(dev_origin)
+        self.BACKEND_CORS_ORIGINS = [o for o in origins if o != "*"]
+        return self
 
     # ML & Forecasting Configuration
     MODEL_ARTIFACTS_DIR: str = "./artifacts/models"
