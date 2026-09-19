@@ -6,9 +6,20 @@
  */
 
 function getApiBaseUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-  const clean = raw.trim().replace(/\/+$/, '');
-  return clean.endsWith('/api/v1') ? clean : `${clean}/api/v1`;
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    const raw = process.env.NEXT_PUBLIC_API_URL;
+    const clean = raw.trim().replace(/\/+$/, '');
+    return clean.endsWith('/api/v1') ? clean : `${clean}/api/v1`;
+  }
+
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1' && hostname !== '0.0.0.0') {
+      return 'https://foresight-api-5vok.onrender.com/api/v1';
+    }
+  }
+
+  return 'http://localhost:8000/api/v1';
 }
 
 export const API_BASE_URL = getApiBaseUrl();

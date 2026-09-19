@@ -265,7 +265,7 @@ export function RiskStateDashboard() {
             ref={subNavContainerRef}
             role="tablist"
             aria-label="Risk State Sub-views"
-            className="liquid-nav-island w-full md:w-auto min-w-[340px]"
+            className="liquid-nav-island w-full md:w-auto max-w-full overflow-x-auto no-scrollbar"
           >
             <div
               className="liquid-nav-indicator"
@@ -292,7 +292,7 @@ export function RiskStateDashboard() {
                   aria-controls={`risk-panel-${tab.id}`}
                   tabIndex={isActive ? 0 : -1}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`liquid-nav-tab flex-1 ${isActive ? 'is-active' : ''}`}
+                  className={`liquid-nav-tab flex-1 whitespace-nowrap ${isActive ? 'is-active' : ''}`}
                 >
                   <Icon className={`w-3.5 h-3.5 transition-colors duration-200 ${isActive ? 'text-cyan-400' : 'text-slate-500'}`} />
                   <span>{tab.label}</span>
@@ -316,7 +316,7 @@ export function RiskStateDashboard() {
       <div className="glass-panel p-5 sm:p-6 rounded-2xl border border-glass-border relative overflow-hidden">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-5 border-b border-white/[0.06]">
           <div className="space-y-2">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <span className="text-xs font-mono text-slate-400 uppercase">System Security State:</span>
               <span className={`px-3 py-1 rounded-full text-xs font-bold font-mono tracking-wide border ${stateMeta.badge}`}>
                 ● {isAwaitingTelemetry ? 'AWAITING TELEMETRY' : currentState}
@@ -334,26 +334,26 @@ export function RiskStateDashboard() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto font-mono text-xs">
-            <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center min-w-[110px]">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full lg:w-auto font-mono text-xs">
+            <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
               <span className="text-[10px] text-slate-400 block mb-0.5">Persistence</span>
               <span className="text-base font-bold text-white">
                 Cycle {evaluation?.cycles_in_state ?? 1}
               </span>
             </div>
-            <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center min-w-[110px]">
+            <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
               <span className="text-[10px] text-slate-400 block mb-0.5">Max Cal. Risk</span>
               <span className={`text-base font-bold ${currentState === 'CRITICAL' || currentState === 'ELEVATED' ? 'text-rose-400' : 'text-cyan-300'}`}>
                 {evaluation ? `${(evaluation.max_calibrated_probability * 100).toFixed(1)}%` : '--'}
               </span>
             </div>
-            <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center min-w-[110px]">
+            <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
               <span className="text-[10px] text-slate-400 block mb-0.5">Anomaly Score</span>
               <span className="text-base font-bold text-emerald-300">
                 {evaluation ? evaluation.anomaly_score.toFixed(3) : '--'}
               </span>
             </div>
-            <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center min-w-[110px]">
+            <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
               <span className="text-[10px] text-slate-400 block mb-0.5">Active Alerts</span>
               <span className="text-base font-bold text-indigo-300">
                 {evaluation?.active_alert_horizons?.length ? `${evaluation.active_alert_horizons.length} Horizons` : '0 Active'}
@@ -363,7 +363,7 @@ export function RiskStateDashboard() {
         </div>
 
         {/* 5-Stage State Progression Track */}
-        <div className="mt-5 grid grid-cols-5 gap-2 text-center text-xs font-mono">
+        <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 text-center text-xs font-mono">
           {(['NORMAL', 'WATCH', 'SUSPICIOUS', 'ELEVATED', 'CRITICAL'] as const).map((st) => {
             const isCurrent = currentState === st;
             const meta = STATE_CONFIG[st];
@@ -376,9 +376,9 @@ export function RiskStateDashboard() {
                     : 'bg-slate-900/30 border-white/[0.04] text-slate-500'
                 }`}
               >
-                <div className="flex items-center justify-center gap-1">
-                  <span className={`w-1.5 h-1.5 rounded-full ${isCurrent ? 'bg-current' : 'bg-slate-600'}`} />
-                  <span className="text-[11px] truncate">{st}</span>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isCurrent ? 'bg-current' : 'bg-slate-600'}`} />
+                  <span className="text-[11px] truncate font-medium">{st}</span>
                 </div>
               </div>
             );

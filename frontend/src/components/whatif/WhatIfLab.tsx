@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { API_BASE_URL } from '@/lib/api/client';
+import { counterfactualApi, FeatureMetadataCatalogResponse, CounterfactualScenarioResponse, FeatureMetadataItem, CounterfactualPreset, AppliedFeaturePerturbation, HorizonCounterfactualResult, ShapDeltaItem } from '@/lib/api/counterfactual';
+import { ApiError } from '@/lib/api/client';
 import {
   Sliders,
   Sparkles,
@@ -28,96 +29,6 @@ import {
   Check
 } from 'lucide-react';
 
-interface FeatureMetadata {
-  index: number;
-  name: string;
-  display_name: string;
-  datatype: string;
-  unit: string | null;
-  category: string;
-  classification: 'DIRECTLY_PERTURBABLE' | 'DERIVED' | 'DEPENDENCY_CONSTRAINED' | string;
-  min_value: number;
-  max_value: number;
-  default_value: number;
-  slider_step: number;
-  description: string;
-  positive_risk_meaning: string;
-  negative_risk_meaning: string;
-}
-
-interface CounterfactualPreset {
-  preset_id: string;
-  title: string;
-  category: string;
-  description: string;
-  perturbations: Record<string, number>;
-  recompute_derived: boolean;
-  suggested_use_case: string;
-}
-
-interface AppliedPerturbation {
-  feature_name: string;
-  feature_index: number;
-  original_value: number;
-  perturbed_value: number;
-  mode: string;
-  delta: number;
-  delta_percent: number | null;
-  classification: string;
-  unit: string | null;
-  is_derived_auto_sync: boolean;
-}
-
-interface ShapDelta {
-  feature_name: string;
-  feature_index: number;
-  baseline_shap: number;
-  counterfactual_shap: number;
-  delta_shap: number;
-  direction: string;
-  baseline_observed: number;
-  counterfactual_observed: number;
-  unit: string | null;
-}
-
-interface HorizonResult {
-  horizon_minutes: number;
-  baseline_probability: number;
-  counterfactual_probability: number;
-  probability_delta: number;
-  baseline_alert: boolean;
-  counterfactual_alert: boolean;
-  decision_flip: 'ALERT_TO_NO_ALERT' | 'NO_ALERT_TO_ALERT' | 'NO_CHANGE' | string;
-  decision_threshold: number;
-  baseline_conformal_set: number[];
-  counterfactual_conformal_set: number[];
-  conformal_set_transition: string;
-  baseline_uncertainty_score: number;
-  counterfactual_uncertainty_score: number;
-  baseline_uncertainty_level: string;
-  counterfactual_uncertainty_level: string;
-  shap_deltas: ShapDelta[];
-  top_increased_risk_features: string[];
-  top_decreased_risk_features: string[];
-}
-
-interface SimulationResponse {
-  scenario_id: string;
-  scenario_name: string;
-  description?: string;
-  timestamp: string;
-  scientific_disclaimer: string;
-  model_version: string;
-  applied_perturbations: AppliedPerturbation[];
-  horizon_results: Record<string, HorizonResult>;
-  any_decision_flipped: boolean;
-  max_risk_reduction: number;
-  max_risk_elevation: number;
-  execution_latency_ms: number;
-  baseline_vector_summary: Record<string, number>;
-  counterfactual_vector_summary: Record<string, number>;
-}
-
 const CATEGORY_NAMES: Record<string, string> = {
   volume: 'Traffic Volume & Rates',
   duration: 'Flow Duration & Variance',
@@ -128,15 +39,12 @@ const CATEGORY_NAMES: Record<string, string> = {
   anomaly: 'Behavioral Anomaly Model',
 };
 
-export function WhatIfLab() {
-  const [catalog, setCatalog] = useState<{
-    features: FeatureMetadata[];
-    presets: CounterfactualPreset[];
-    scientific_disclaimer: string;
-  } | null>(null);
+type ErrorType = 'NETWORK_ERROR' | 'AUTH_ERROR' | 'BACKEND_ERROR' | 'VALIDATION_ERROR' | null;
 
-  const [loadingCatalog, setLoadingCatalog] = useState(true);
-  const [evaluating, setEvaluating] = useState(false);
+export function WhatIfLab() {
+  const [catalog, setCatalog] = useState<FeatureMetadataCatalogResponse | null>(null);
+  const [loadingCatalog, setLoadingCatalog] = useState<boolean>(true);
+  const [evaluating, setEvaluating] = useState<boolean>(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [recomputeDerived, setRecomputeDerived] = useState(true);
@@ -148,62 +56,72 @@ export function WhatIfLab() {
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
 
   // Simulation response & history
-  const [currentResult, setCurrentResult] = useState<SimulationResponse | null>(null);
-  const [history, setHistory] = useState<SimulationResponse[]>([]);
+  const [currentResult, setCurrentResult] = useState<CounterfactualScenarioResponse | null>(null);
+  const [history, setHistory] = useState<CounterfactualScenarioResponse[]>([]);
   const [selectedHorizonTab, setSelectedHorizonTab] = useState<string>('15');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<ErrorType>(null);
 
   // 1. Fetch feature catalog and presets
-  useEffect(() => {
-    async function loadCatalog() {
-      try {
-        setLoadingCatalog(true);
-        const res = await fetch(`${API_BASE_URL}/model/counterfactual/features`);
-        if (!res.ok) throw new Error('Failed to load feature catalog');
-        const data = await res.json();
-        setCatalog(data);
+  const loadCatalog = useCallback(async () => {
+    try {
+      setLoadingCatalog(true);
+      setErrorMsg(null);
+      setErrorType(null);
 
-        // Initialize baseline values with defaults
-        const baseMap: Record<string, number> = {};
-        data.features.forEach((f: FeatureMetadata) => {
-          baseMap[f.name] = f.default_value;
-        });
-        setBaselineValues(baseMap);
+      const data = await counterfactualApi.getCatalog();
+      setCatalog(data);
 
-        // Run initial default simulation
-        runInitialSimulation(baseMap);
-      } catch (err: any) {
-        setErrorMsg(err.message || 'Error connecting to counterfactual engine');
-      } finally {
-        setLoadingCatalog(false);
+      // Initialize baseline values with defaults
+      const baseMap: Record<string, number> = {};
+      data.features.forEach((f: FeatureMetadataItem) => {
+        baseMap[f.name] = f.default_value;
+      });
+      setBaselineValues(baseMap);
+
+      // Run initial default simulation
+      await runInitialSimulation(baseMap);
+    } catch (err: any) {
+      if (err instanceof ApiError) {
+        if (err.status === 401) {
+          setErrorType('AUTH_ERROR');
+          setErrorMsg('Authentication token expired or session unverified.');
+        } else if (err.code === 'NETWORK_ERROR' || err.status === 0) {
+          setErrorType('NETWORK_ERROR');
+          setErrorMsg('Unable to connect to the Foresight AI forecasting API. The backend service may be cold-starting on Render.');
+        } else {
+          setErrorType('BACKEND_ERROR');
+          setErrorMsg(err.message || 'Failed to initialize counterfactual forecasting models.');
+        }
+      } else {
+        setErrorType('NETWORK_ERROR');
+        setErrorMsg(err.message || 'Unable to connect to the counterfactual engine.');
       }
+    } finally {
+      setLoadingCatalog(false);
     }
-    loadCatalog();
   }, []);
+
+  useEffect(() => {
+    loadCatalog();
+  }, [loadCatalog]);
 
   // Run initial simulation
   const runInitialSimulation = async (baseMap: Record<string, number>) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/model/counterfactual`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          scenario_name: 'Baseline Operational State',
-          description: 'Initial nominal perimeter state',
-          perturbations: { syn_count: baseMap['syn_count'] || 45.0 },
-          recompute_derived: true,
-          include_shap: true,
-        }),
+      const data = await counterfactualApi.evaluateScenario({
+        scenario_name: 'Baseline Operational State',
+        description: 'Initial nominal perimeter state',
+        perturbations: { syn_count: baseMap['syn_count'] || 45.0 },
+        recompute_derived: true,
+        include_shap: true,
       });
-      if (res.ok) {
-        const data: SimulationResponse = await res.json();
-        setCurrentResult(data);
-        if (data.baseline_vector_summary) {
-          setBaselineValues(data.baseline_vector_summary);
-        }
+      setCurrentResult(data);
+      if (data.baseline_vector_summary) {
+        setBaselineValues(data.baseline_vector_summary);
       }
     } catch {
-      // Standby fallback
+      // Non-blocking fallback for initial probe
     }
   };
 
@@ -252,6 +170,7 @@ export function WhatIfLab() {
     try {
       setEvaluating(true);
       setErrorMsg(null);
+      setErrorType(null);
 
       // If no perturbations active, supply trivial baseline probe
       const payloadPerturbs =
@@ -267,25 +186,28 @@ export function WhatIfLab() {
         include_shap: includeShap,
       };
 
-      const res = await fetch(`${API_BASE_URL}/model/counterfactual`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.detail || 'Counterfactual evaluation failed');
-      }
-
-      const data: SimulationResponse = await res.json();
+      const data = await counterfactualApi.evaluateScenario(payload);
       setCurrentResult(data);
       setHistory((prev) => [data, ...prev.slice(0, 9)]);
       if (data.baseline_vector_summary) {
         setBaselineValues(data.baseline_vector_summary);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Simulation failed');
+      if (err instanceof ApiError) {
+        if (err.status === 401) {
+          setErrorType('AUTH_ERROR');
+          setErrorMsg('Session expired. Please sign in to execute simulations.');
+        } else if (err.status === 422) {
+          setErrorType('VALIDATION_ERROR');
+          setErrorMsg(err.message || 'Feature perturbations outside allowed boundary conditions.');
+        } else {
+          setErrorType('BACKEND_ERROR');
+          setErrorMsg(err.message || 'Counterfactual simulation failed on the backend.');
+        }
+      } else {
+        setErrorType('NETWORK_ERROR');
+        setErrorMsg(err.message || 'Simulation network request failed.');
+      }
     } finally {
       setEvaluating(false);
     }
@@ -306,37 +228,97 @@ export function WhatIfLab() {
   }, [catalog, activeCategory, searchQuery]);
 
   const activePerturbationCount = Object.keys(perturbations).length;
-  const currentHorizonResult = currentResult?.horizon_results[selectedHorizonTab];
+  const currentHorizonResult = currentResult?.horizon_results?.[selectedHorizonTab];
+
+  // 1. Initial Full Loading State
+  if (loadingCatalog) {
+    return (
+      <div className="space-y-6 animate-tab-content">
+        <div className="glass-panel p-8 sm:p-12 rounded-2xl border border-glass-border flex flex-col items-center justify-center py-20 text-center space-y-4">
+          <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-400/30 text-cyan-400 animate-pulse">
+            <Sliders className="w-8 h-8 animate-spin" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white tracking-tight">Initializing What-If Scenario Lab</h3>
+            <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+              Connecting to Foresight AI forecasting engine, loading 37-feature telemetry schema definitions, and preparing multi-horizon sensitivity models (+5m, +15m, +30m, +60m)...
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-mono text-cyan-400 bg-cyan-950/60 px-3 py-1.5 rounded-full border border-cyan-800/40">
+            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            <span>Syncing telemetry contracts...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Initial Full Load Error State (Prevents empty broken UI)
+  if (!catalog && errorMsg) {
+    const isAuth = errorType === 'AUTH_ERROR';
+    return (
+      <div className="space-y-6 animate-tab-content">
+        <div className="glass-panel p-8 sm:p-12 rounded-2xl border border-rose-500/30 bg-rose-950/10 flex flex-col items-center justify-center py-16 text-center space-y-4">
+          <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400">
+            <AlertTriangle className="w-8 h-8" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white tracking-tight">
+              {isAuth ? 'Session Authentication Required' : 'Forecasting Engine Unavailable'}
+            </h3>
+            <p className="text-xs text-slate-300 mt-1.5 max-w-lg mx-auto leading-relaxed">
+              {isAuth
+                ? 'Your security session has expired or requires analyst authorization to run model sensitivity simulations.'
+                : errorMsg}
+            </p>
+            {!isAuth && (
+              <p className="text-[11px] text-slate-400 mt-2 font-mono">
+                If the backend was inactive, Render free instances wake up in ~30–45s.
+              </p>
+            )}
+          </div>
+          <div className="flex items-center gap-3 pt-2">
+            <button
+              onClick={() => loadCatalog()}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 font-mono text-xs font-semibold border border-cyan-500/40 transition-all shadow-glow-cyan"
+            >
+              <RefreshCw className="w-4 h-4" /> Retry Connection
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-tab-content">
       {/* 1. Header Banner & Scientific Disclaimer */}
-      <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-glass-border">
+      <div className="glass-panel p-5 sm:p-8 rounded-2xl border border-glass-border">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/[0.06]">
-          <div>
+          <div className="min-w-0">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-mono mb-3 border border-cyan-500/20">
               <Sliders className="w-3.5 h-3.5" /> Model Sensitivity & Counterfactual Engine
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white tracking-tight">
               Interactive What-If Scenario Lab
             </h2>
-            <p className="mt-2 text-slate-300 text-sm max-w-3xl leading-relaxed">
+            <p className="mt-2 text-slate-300 text-xs sm:text-sm max-w-3xl leading-relaxed">
               Perturb 37-dimensional network telemetry features and trigger real model re-inference across all forward horizons. Evaluate how rate limits, firewall rules, and traffic anomalies shift probability distributions, flip alert decisions, and transform TreeSHAP attributions.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 shrink-0">
             <button
               onClick={() => runSimulation()}
               disabled={evaluating}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 font-mono text-sm font-semibold border border-cyan-500/40 transition-all shadow-glow-cyan disabled:opacity-50"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 font-mono text-xs sm:text-sm font-semibold border border-cyan-500/40 transition-all shadow-glow-cyan disabled:opacity-50"
             >
               <Play className={`w-4 h-4 ${evaluating ? 'animate-spin' : ''}`} />
               {evaluating ? 'Simulating...' : 'Run Simulation'}
             </button>
             <button
               onClick={handleResetAll}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 font-mono text-sm border border-white/[0.08] transition-all"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 font-mono text-xs sm:text-sm border border-white/[0.08] transition-all"
             >
               <RotateCcw className="w-4 h-4" /> Reset
             </button>
@@ -346,7 +328,7 @@ export function WhatIfLab() {
         {/* Scientific Framing Alert */}
         <div className="mt-4 p-3.5 rounded-xl bg-slate-900/80 border border-cyan-500/20 flex items-start gap-3 text-xs text-slate-300">
           <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-          <div>
+          <div className="min-w-0">
             <strong className="text-cyan-300 font-semibold font-mono">SCIENTIFIC METHODOLOGY NOTE: </strong>
             <span>
               This simulation quantifies <em>model sensitivity</em> (ΔP = P<sub>counterfactual</sub> − P<sub>baseline</sub>) under frozen gradient boosted trees and Isotonic calibrators. It isolates how the model responds to specific feature shifts; it does not claim real-world physical causal counterfactuals.
@@ -360,7 +342,7 @@ export function WhatIfLab() {
             <Zap className="w-3.5 h-3.5 text-amber-400" />
             Intervention & Stress-Testing Presets:
           </span>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2.5">
             {catalog?.presets.map((preset) => {
               const isSelected = selectedPreset === preset.preset_id;
               const isMitigation = preset.category.includes('Mitigation');
@@ -368,7 +350,7 @@ export function WhatIfLab() {
                 <button
                   key={preset.preset_id}
                   onClick={() => handleApplyPreset(preset)}
-                  className={`p-3 rounded-xl border text-left transition-all ${
+                  className={`p-3 rounded-xl border text-left transition-all min-w-0 ${
                     isSelected
                       ? 'bg-cyan-500/20 border-cyan-400/60 shadow-glow-cyan'
                       : 'bg-slate-900/60 hover:bg-slate-800/80 border-white/[0.06]'
@@ -384,7 +366,7 @@ export function WhatIfLab() {
                     </span>
                     {isSelected && <Check className="w-3.5 h-3.5 text-cyan-400" />}
                   </div>
-                  <h4 className="text-xs font-semibold text-slate-100 mt-2 line-clamp-1">{preset.title}</h4>
+                  <h4 className="text-xs font-semibold text-slate-100 mt-2 truncate">{preset.title}</h4>
                   <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-tight">{preset.description}</p>
                 </button>
               );
@@ -393,18 +375,27 @@ export function WhatIfLab() {
         </div>
       </div>
 
+      {/* Inline Warning/Error Banner */}
       {errorMsg && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-3">
-          <AlertTriangle className="w-4 h-4 shrink-0" />
-          <span>{errorMsg}</span>
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span className="truncate">{errorMsg}</span>
+          </div>
+          <button
+            onClick={() => runSimulation()}
+            className="px-3 py-1 rounded-lg bg-rose-500/20 text-rose-200 hover:bg-rose-500/30 font-mono text-xs shrink-0"
+          >
+            Retry
+          </button>
         </div>
       )}
 
       {/* 3. Main Dual-Column Simulation Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
         {/* Left Column: Feature Perturbation Controls (7 Cols) */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="glass-panel p-5 rounded-2xl border border-glass-border">
+        <div className="lg:col-span-7 space-y-4 min-w-0">
+          <div className="glass-panel p-4 sm:p-5 rounded-2xl border border-glass-border">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/[0.06]">
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-cyan-400" />
@@ -415,14 +406,14 @@ export function WhatIfLab() {
               </div>
 
               {/* Search Box */}
-              <div className="relative">
+              <div className="relative w-full sm:w-48">
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                 <input
                   type="text"
                   placeholder="Filter 37 features..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-900/90 border border-white/[0.08] text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 w-full sm:w-48 font-mono"
+                  className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-900/90 border border-white/[0.08] text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 w-full font-mono"
                 />
               </div>
             </div>
@@ -455,7 +446,7 @@ export function WhatIfLab() {
             </div>
 
             {/* Toggles */}
-            <div className="flex items-center justify-between py-2 text-xs text-slate-400 border-b border-white/[0.04]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-2.5 text-xs text-slate-400 border-b border-white/[0.04]">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -478,11 +469,7 @@ export function WhatIfLab() {
 
             {/* Feature Slider List */}
             <div className="divide-y divide-white/[0.04] max-h-[580px] overflow-y-auto pr-1">
-              {loadingCatalog ? (
-                <div className="py-12 text-center text-slate-400 font-mono text-xs animate-pulse">
-                  Loading feature schemas...
-                </div>
-              ) : filteredFeatures.length === 0 ? (
+              {filteredFeatures.length === 0 ? (
                 <div className="py-12 text-center text-slate-400 font-mono text-xs">
                   No matching features found.
                 </div>
@@ -495,13 +482,13 @@ export function WhatIfLab() {
                   const deltaPct = baseVal !== 0 ? (delta / baseVal) * 100 : null;
 
                   return (
-                    <div key={feat.name} className="py-3.5 space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-slate-200">{feat.display_name}</span>
-                          <span className="text-[10px] font-mono text-slate-500">[{feat.unit || 'unitless'}]</span>
+                    <div key={feat.name} className="py-3.5 space-y-2 min-w-0">
+                      <div className="flex flex-wrap items-center justify-between gap-1 text-xs">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-semibold text-slate-200 truncate">{feat.display_name}</span>
+                          <span className="text-[10px] font-mono text-slate-500 shrink-0">[{feat.unit || 'unitless'}]</span>
                           <span
-                            className={`text-[9px] font-mono px-1.5 py-0.2 rounded ${
+                            className={`text-[9px] font-mono px-1.5 py-0.2 rounded shrink-0 ${
                               feat.classification === 'DIRECTLY_PERTURBABLE'
                                 ? 'bg-cyan-500/10 text-cyan-400'
                                 : feat.classification === 'DERIVED'
@@ -518,7 +505,7 @@ export function WhatIfLab() {
                         </div>
 
                         {/* Baseline vs Current & Delta */}
-                        <div className="flex items-center gap-2 font-mono">
+                        <div className="flex items-center gap-2 font-mono ml-auto">
                           {isPerturbed && (
                             <>
                               <span
@@ -550,8 +537,8 @@ export function WhatIfLab() {
                       </div>
 
                       {/* Slider and Range Bounds */}
-                      <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-mono text-slate-500 min-w-[36px]">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <span className="text-[10px] font-mono text-slate-500 min-w-[32px] sm:min-w-[36px]">
                           {feat.min_value}
                         </span>
                         <input
@@ -561,9 +548,9 @@ export function WhatIfLab() {
                           step={feat.slider_step}
                           value={currentVal}
                           onChange={(e) => handleFeatureChange(feat.name, parseFloat(e.target.value))}
-                          className="flex-1 accent-cyan-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer"
+                          className="flex-1 accent-cyan-400 bg-slate-800 h-1.5 rounded-lg cursor-pointer min-w-0"
                         />
-                        <span className="text-[10px] font-mono text-slate-500 min-w-[36px] text-right">
+                        <span className="text-[10px] font-mono text-slate-500 min-w-[32px] sm:min-w-[36px] text-right">
                           {feat.max_value}
                         </span>
                       </div>
@@ -577,9 +564,9 @@ export function WhatIfLab() {
         </div>
 
         {/* Right Column: Comparative Multi-Horizon Results & TreeSHAP (5 Cols) */}
-        <div className="lg:col-span-5 space-y-4">
+        <div className="lg:col-span-5 space-y-4 min-w-0">
           {/* Multi-Horizon Probability Diff Cards */}
-          <div className="glass-panel p-5 rounded-2xl border border-glass-border space-y-4">
+          <div className="glass-panel p-4 sm:p-5 rounded-2xl border border-glass-border space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-cyan-400" />
@@ -591,11 +578,11 @@ export function WhatIfLab() {
             </div>
 
             {/* Horizon Selector Tabs */}
-            <div className="grid grid-cols-4 gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-white/[0.04]">
+            <div className="grid grid-cols-4 gap-1 sm:gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-white/[0.04]">
               {['5', '15', '30', '60'].map((hStr) => {
-                const res = currentResult?.horizon_results[hStr];
+                const res = currentResult?.horizon_results?.[hStr];
                 const isSelected = selectedHorizonTab === hStr;
-                const isFlipped = res?.decision_flip !== 'NO_CHANGE';
+                const isFlipped = res?.decision_flip && res.decision_flip !== 'NO_CHANGE';
                 return (
                   <button
                     key={hStr}
@@ -619,11 +606,11 @@ export function WhatIfLab() {
             </div>
 
             {/* Selected Horizon Detail Card */}
-            {currentHorizonResult && (
+            {currentHorizonResult ? (
               <div className="space-y-4 pt-2">
                 {/* Decision Flip Banner */}
                 <div
-                  className={`p-3 rounded-xl border flex items-center justify-between ${
+                  className={`p-3 rounded-xl border flex items-center justify-between gap-2 ${
                     currentHorizonResult.decision_flip === 'ALERT_TO_NO_ALERT'
                       ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
                       : currentHorizonResult.decision_flip === 'NO_ALERT_TO_ALERT'
@@ -631,16 +618,16 @@ export function WhatIfLab() {
                       : 'bg-slate-900/60 border-white/[0.06] text-slate-300'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
                     {currentHorizonResult.decision_flip === 'ALERT_TO_NO_ALERT' ? (
-                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                      <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                     ) : currentHorizonResult.decision_flip === 'NO_ALERT_TO_ALERT' ? (
-                      <ShieldAlert className="w-4 h-4 text-rose-400" />
+                      <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
                     ) : (
-                      <CheckCircle2 className="w-4 h-4 text-slate-400" />
+                      <CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0" />
                     )}
-                    <div>
-                      <div className="text-xs font-semibold font-mono">
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold font-mono truncate">
                         {currentHorizonResult.decision_flip === 'ALERT_TO_NO_ALERT'
                           ? 'DECISION FLIP: ALERT CLEARED'
                           : currentHorizonResult.decision_flip === 'NO_ALERT_TO_ALERT'
@@ -654,7 +641,7 @@ export function WhatIfLab() {
                   </div>
 
                   {/* Conformal Set Shift */}
-                  <div className="text-right font-mono text-xs">
+                  <div className="text-right font-mono text-xs shrink-0">
                     <span className="text-[10px] text-slate-400 block">Conformal Set</span>
                     <span className="font-bold text-cyan-300">
                       {currentHorizonResult.conformal_set_transition}
@@ -663,7 +650,7 @@ export function WhatIfLab() {
                 </div>
 
                 {/* Probability Gauges (Baseline vs Counterfactual) */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {/* Baseline */}
                   <div className="p-3.5 rounded-xl bg-slate-900/70 border border-white/[0.06]">
                     <span className="text-[10px] font-mono text-slate-400 block uppercase">
@@ -736,7 +723,7 @@ export function WhatIfLab() {
                   </h4>
 
                   <div className="space-y-2">
-                    {currentHorizonResult.shap_deltas.length === 0 ? (
+                    {!currentHorizonResult.shap_deltas || currentHorizonResult.shap_deltas.length === 0 ? (
                       <p className="text-xs text-slate-500 font-mono italic">
                         No significant feature attribution differential.
                       </p>
@@ -749,9 +736,9 @@ export function WhatIfLab() {
                             className="p-2.5 rounded-xl bg-slate-900/50 border border-white/[0.04] text-xs space-y-1"
                           >
                             <div className="flex items-center justify-between font-mono">
-                              <span className="text-slate-200 font-semibold">{item.feature_name}</span>
+                              <span className="text-slate-200 font-semibold truncate">{item.feature_name}</span>
                               <span
-                                className={`font-bold ${
+                                className={`font-bold shrink-0 ml-2 ${
                                   isReduction ? 'text-emerald-400' : 'text-rose-400'
                                 }`}
                               >
@@ -779,6 +766,10 @@ export function WhatIfLab() {
                   </div>
                 </div>
               </div>
+            ) : (
+              <div className="py-8 text-center text-slate-400 font-mono text-xs">
+                Run simulation to compute multi-horizon risk sensitivity.
+              </div>
             )}
           </div>
 
@@ -790,13 +781,13 @@ export function WhatIfLab() {
                 <span>Session Simulation History</span>
               </div>
               <div className="divide-y divide-white/[0.04] mt-2 max-h-40 overflow-y-auto">
-                {history.map((histItem, idx) => (
+                {history.map((histItem) => (
                   <div
                     key={histItem.scenario_id}
-                    className="py-2 flex items-center justify-between text-xs font-mono"
+                    className="py-2 flex items-center justify-between text-xs font-mono gap-2"
                   >
-                    <div>
-                      <span className="text-slate-300 font-semibold block line-clamp-1">
+                    <div className="min-w-0">
+                      <span className="text-slate-300 font-semibold block truncate">
                         {histItem.scenario_name}
                       </span>
                       <span className="text-[10px] text-slate-500">
@@ -804,7 +795,7 @@ export function WhatIfLab() {
                         {histItem.applied_perturbations.length} shifts
                       </span>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       {histItem.max_risk_reduction > 0 ? (
                         <span className="text-emerald-400 text-[11px]">
                           ▼ -{(histItem.max_risk_reduction * 100).toFixed(0)}%

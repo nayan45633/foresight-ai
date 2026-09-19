@@ -190,7 +190,7 @@ export default function Home() {
           ref={navContainerRef}
           role="tablist"
           aria-label="Main Navigation"
-          className="liquid-nav-island w-full xl:w-auto overflow-x-auto"
+          className="liquid-nav-island w-full xl:w-auto max-w-full overflow-x-auto no-scrollbar"
         >
           {/* Moving Light/Refraction Active Tile */}
           <div
@@ -219,7 +219,7 @@ export default function Home() {
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => setActiveTab(tab.id)}
                 onKeyDown={(e) => handleKeyDown(e, idx)}
-                className={`liquid-nav-tab flex-1 sm:flex-initial text-xs ${isActive ? 'is-active' : ''}`}
+                className={`liquid-nav-tab flex-1 sm:flex-initial text-xs whitespace-nowrap shrink-0 ${isActive ? 'is-active' : ''}`}
               >
                 <Icon
                   className={`w-3.5 h-3.5 transition-colors duration-200 shrink-0 ${

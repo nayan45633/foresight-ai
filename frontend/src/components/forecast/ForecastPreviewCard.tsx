@@ -290,7 +290,7 @@ export function ForecastPreviewCard() {
             ref={subNavContainerRef}
             role="tablist"
             aria-label="Intelligence Sub-views"
-            className="liquid-nav-island w-full md:w-auto min-w-[320px]"
+            className="liquid-nav-island w-full md:w-auto max-w-full overflow-x-auto no-scrollbar"
           >
             {/* Sliding Moving Glass Highlight */}
             <div 
@@ -318,7 +318,7 @@ export function ForecastPreviewCard() {
                   aria-controls={`subpanel-${tab.id}`}
                   tabIndex={isActive ? 0 : -1}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`liquid-nav-tab flex-1 ${isActive ? 'is-active' : ''}`}
+                  className={`liquid-nav-tab flex-1 whitespace-nowrap ${isActive ? 'is-active' : ''}`}
                 >
                   <Icon className={`w-3.5 h-3.5 transition-colors duration-200 ${isActive ? 'text-cyan-400' : 'text-slate-500'}`} />
                   <span>{tab.label}</span>
