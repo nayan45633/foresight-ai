@@ -130,13 +130,19 @@ export async function apiClient<T>(
   }
 
   let response: Response;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 45000);
+
   try {
     response = await fetch(url, {
       ...options,
       headers,
+      signal: options.signal || controller.signal,
     });
   } catch (netErr: any) {
     throw new ApiError(0, 'Network connection unavailable. Please check SOC API status.', 'NETWORK_ERROR');
+  } finally {
+    clearTimeout(timeoutId);
   }
 
   // Handle 401 Unauthorized with token refresh rotation

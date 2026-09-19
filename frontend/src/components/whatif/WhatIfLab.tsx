@@ -62,8 +62,8 @@ export function WhatIfLab() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<ErrorType>(null);
 
-  // 1. Fetch feature catalog and presets
-  const loadCatalog = useCallback(async () => {
+  // 1. Fetch feature catalog and presets with cold-start auto-retry
+  const loadCatalog = useCallback(async (retryCount = 0) => {
     try {
       setLoadingCatalog(true);
       setErrorMsg(null);
@@ -82,11 +82,23 @@ export function WhatIfLab() {
       // Run initial default simulation
       await runInitialSimulation(baseMap);
     } catch (err: any) {
+      const isNetwork =
+        (err instanceof ApiError &&
+          (err.code === 'NETWORK_ERROR' || err.status === 0 || err.status === 502 || err.status === 503 || err.status === 504)) ||
+        !(err instanceof ApiError);
+
+      if (isNetwork && retryCount < 3) {
+        setTimeout(() => {
+          loadCatalog(retryCount + 1);
+        }, (retryCount + 1) * 3000);
+        return;
+      }
+
       if (err instanceof ApiError) {
         if (err.status === 401) {
           setErrorType('AUTH_ERROR');
           setErrorMsg('Authentication token expired or session unverified.');
-        } else if (err.code === 'NETWORK_ERROR' || err.status === 0) {
+        } else if (err.code === 'NETWORK_ERROR' || err.status === 0 || err.status === 502 || err.status === 503 || err.status === 504) {
           setErrorType('NETWORK_ERROR');
           setErrorMsg('Unable to connect to the Foresight AI forecasting API. The backend service may be cold-starting on Render.');
         } else {
