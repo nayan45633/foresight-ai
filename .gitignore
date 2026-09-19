@@ -55,6 +55,7 @@ venv.bak/
 .env.test.local
 .env.production.local
 !.env.example
+!frontend/.env.example
 !backend/.env.production.example
 
 # Node / Frontend Artifacts

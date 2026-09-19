@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { API_BASE_URL } from '@/lib/api/client';
 import {
   ShieldAlert,
   ShieldCheck,
@@ -205,8 +206,8 @@ export function RiskStateDashboard() {
       setLoading(true);
       setError(null);
       const [stateRes, timelineRes] = await Promise.all([
-        fetch('http://localhost:8000/api/v1/risk/state'),
-        fetch('http://localhost:8000/api/v1/risk/timeline'),
+        fetch(`${API_BASE_URL}/risk/state`),
+        fetch(`${API_BASE_URL}/risk/timeline`),
       ]);
 
       if (stateRes.ok) {

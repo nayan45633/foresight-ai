@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import { API_BASE_URL } from '@/lib/api/client';
 import { 
   UploadCloud, 
   FileText, 
@@ -64,7 +65,7 @@ export const PcapUploadCard: React.FC<PcapUploadCardProps> = ({ onUploadSuccess 
   const pollJobStatus = async (jobId: string) => {
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/telemetry/ingestion/${jobId}`);
+        const res = await fetch(`${API_BASE_URL}/telemetry/ingestion/${jobId}`);
         if (res.ok) {
           const data: PcapJobStatus = await res.json();
           setJobStatus(data);
@@ -97,7 +98,7 @@ export const PcapUploadCard: React.FC<PcapUploadCardProps> = ({ onUploadSuccess 
     formData.append('file', selectedFile);
 
     try {
-      const res = await fetch('http://localhost:8000/api/v1/telemetry/pcap', {
+      const res = await fetch(`${API_BASE_URL}/telemetry/pcap`, {
         method: 'POST',
         body: formData,
       });

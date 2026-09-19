@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { API_BASE_URL } from '@/lib/api/client';
 import {
   Sliders,
   Sparkles,
@@ -157,7 +158,7 @@ export function WhatIfLab() {
     async function loadCatalog() {
       try {
         setLoadingCatalog(true);
-        const res = await fetch('http://localhost:8000/api/v1/model/counterfactual/features');
+        const res = await fetch(`${API_BASE_URL}/model/counterfactual/features`);
         if (!res.ok) throw new Error('Failed to load feature catalog');
         const data = await res.json();
         setCatalog(data);
@@ -183,7 +184,7 @@ export function WhatIfLab() {
   // Run initial simulation
   const runInitialSimulation = async (baseMap: Record<string, number>) => {
     try {
-      const res = await fetch('http://localhost:8000/api/v1/model/counterfactual', {
+      const res = await fetch(`${API_BASE_URL}/model/counterfactual`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -266,7 +267,7 @@ export function WhatIfLab() {
         include_shap: includeShap,
       };
 
-      const res = await fetch('http://localhost:8000/api/v1/model/counterfactual', {
+      const res = await fetch(`${API_BASE_URL}/model/counterfactual`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

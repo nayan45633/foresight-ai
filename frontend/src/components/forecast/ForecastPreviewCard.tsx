@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/lib/api/client';
 import { 
   ShieldAlert, 
   BrainCircuit, 
@@ -207,9 +208,9 @@ export function ForecastPreviewCard() {
       setError(null);
       
       const [timelineRes, leadTimeRes, globalShapRes] = await Promise.all([
-        fetch('http://localhost:8000/api/v1/model/forecast/timeline'),
-        fetch('http://localhost:8000/api/v1/model/lead-time'),
-        fetch('http://localhost:8000/api/v1/model/explain/global')
+        fetch(`${API_BASE_URL}/model/forecast/timeline`),
+        fetch(`${API_BASE_URL}/model/lead-time`),
+        fetch(`${API_BASE_URL}/model/explain/global`)
       ]);
 
       if (timelineRes.ok) {

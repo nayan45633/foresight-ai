@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { API_BASE_URL } from '@/lib/api/client';
 import { 
   Activity, 
   Radio, 
@@ -27,9 +28,9 @@ export const TelemetryDashboard: React.FC = () => {
   const fetchTelemetryData = async () => {
     try {
       const [statsRes, qualityRes, flowsRes] = await Promise.all([
-        fetch('http://localhost:8000/api/v1/telemetry/statistics').then((r) => (r.ok ? r.json() : null)),
-        fetch('http://localhost:8000/api/v1/telemetry/quality').then((r) => (r.ok ? r.json() : null)),
-        fetch('http://localhost:8000/api/v1/telemetry/recent?limit=25').then((r) => (r.ok ? r.json() : [])),
+        fetch(`${API_BASE_URL}/telemetry/statistics`).then((r) => (r.ok ? r.json() : null)),
+        fetch(`${API_BASE_URL}/telemetry/quality`).then((r) => (r.ok ? r.json() : null)),
+        fetch(`${API_BASE_URL}/telemetry/recent?limit=25`).then((r) => (r.ok ? r.json() : [])),
       ]);
 
       if (statsRes) setStats(statsRes);

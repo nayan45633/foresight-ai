@@ -2,7 +2,7 @@
  * Foresight AI - Standard API Client with automatic JSON parsing and typed responses.
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+import { API_BASE_URL } from './api/client';
 
 export class ApiError extends Error {
   constructor(public status: number, public message: string, public details?: any) {
