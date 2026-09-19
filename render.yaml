@@ -3,7 +3,7 @@ services:
     name: foresight-api
     env: python
     rootDir: backend
-    plan: standard
+    plan: free
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python -m alembic upgrade head
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/v1/health
@@ -25,6 +25,6 @@ services:
 
 databases:
   - name: foresight-db
-    plan: standard
+    plan: free
     databaseName: foresight_db
     user: foresight_admin
