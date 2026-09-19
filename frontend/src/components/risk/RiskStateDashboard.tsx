@@ -249,7 +249,9 @@ export function RiskStateDashboard() {
               <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
                 Attack Path Forecasting & Risk State Engine
               </h2>
-              <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-mono border ${stateMeta.badge}`}>
+              <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-mono border ${
+                isAwaitingTelemetry ? 'bg-slate-900/80 text-slate-400 border-white/[0.08]' : stateMeta.badge
+              }`}>
                 {isAwaitingTelemetry ? 'AWAITING TELEMETRY' : `${currentState} STATE`}
               </span>
             </div>
@@ -318,7 +320,9 @@ export function RiskStateDashboard() {
           <div className="space-y-2">
             <div className="flex items-center gap-3 flex-wrap">
               <span className="text-xs font-mono text-slate-400 uppercase">System Security State:</span>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold font-mono tracking-wide border ${stateMeta.badge}`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-bold font-mono tracking-wide border ${
+                isAwaitingTelemetry ? 'bg-slate-900/80 text-slate-400 border-white/[0.08]' : stateMeta.badge
+              }`}>
                 ● {isAwaitingTelemetry ? 'AWAITING TELEMETRY' : currentState}
               </span>
               {evaluation?.is_hysteresis_dampened && (
@@ -338,25 +342,31 @@ export function RiskStateDashboard() {
             <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
               <span className="text-[10px] text-slate-400 block mb-0.5">Persistence</span>
               <span className="text-base font-bold text-white">
-                Cycle {evaluation?.cycles_in_state ?? 1}
+                {isAwaitingTelemetry ? 'Standby' : `Cycle ${evaluation?.cycles_in_state ?? 1}`}
               </span>
             </div>
             <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
               <span className="text-[10px] text-slate-400 block mb-0.5">Max Cal. Risk</span>
-              <span className={`text-base font-bold ${currentState === 'CRITICAL' || currentState === 'ELEVATED' ? 'text-rose-400' : 'text-cyan-300'}`}>
-                {evaluation ? `${(evaluation.max_calibrated_probability * 100).toFixed(1)}%` : '--'}
+              <span className={`text-base font-bold ${
+                !isAwaitingTelemetry && (currentState === 'CRITICAL' || currentState === 'ELEVATED')
+                  ? 'text-rose-400'
+                  : !isAwaitingTelemetry
+                  ? 'text-cyan-300'
+                  : 'text-slate-400'
+              }`}>
+                {evaluation && !isAwaitingTelemetry ? `${(evaluation.max_calibrated_probability * 100).toFixed(1)}%` : 'N/A'}
               </span>
             </div>
             <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
               <span className="text-[10px] text-slate-400 block mb-0.5">Anomaly Score</span>
-              <span className="text-base font-bold text-emerald-300">
-                {evaluation ? evaluation.anomaly_score.toFixed(3) : '--'}
+              <span className={`text-base font-bold ${!isAwaitingTelemetry ? 'text-emerald-300' : 'text-slate-400'}`}>
+                {evaluation && !isAwaitingTelemetry ? evaluation.anomaly_score.toFixed(3) : 'N/A'}
               </span>
             </div>
             <div className="p-3 rounded-xl bg-slate-900/60 border border-white/[0.06] text-center">
               <span className="text-[10px] text-slate-400 block mb-0.5">Active Alerts</span>
-              <span className="text-base font-bold text-indigo-300">
-                {evaluation?.active_alert_horizons?.length ? `${evaluation.active_alert_horizons.length} Horizons` : '0 Active'}
+              <span className={`text-base font-bold ${!isAwaitingTelemetry ? 'text-indigo-300' : 'text-slate-400'}`}>
+                {isAwaitingTelemetry ? 'Awaiting Stream' : (evaluation?.active_alert_horizons?.length ? `${evaluation.active_alert_horizons.length} Horizons` : '0 Active')}
               </span>
             </div>
           </div>
@@ -381,7 +391,7 @@ export function RiskStateDashboard() {
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 text-center text-xs font-mono select-none"
           >
             {(['NORMAL', 'WATCH', 'SUSPICIOUS', 'ELEVATED', 'CRITICAL'] as const).map((st) => {
-              const isCurrent = currentState === st;
+              const isCurrent = !isAwaitingTelemetry && currentState === st;
               const meta = STATE_CONFIG[st];
               return (
                 <div
@@ -392,7 +402,7 @@ export function RiskStateDashboard() {
                       ? `${meta.badge} ring-1 ring-white/20 shadow-glass-card font-bold`
                       : 'bg-slate-900/30 border-white/[0.04] text-slate-500 opacity-60 hover:opacity-80'
                   }`}
-                  title={isCurrent ? `Current Active State: ${st}` : `Derived State: ${st} (Inactive)`}
+                  title={isCurrent ? `Current Active State: ${st}` : isAwaitingTelemetry ? `Standby: Awaiting Telemetry` : `Derived State: ${st} (Inactive)`}
                 >
                   <div className="flex items-center justify-center gap-1.5">
                     <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isCurrent ? 'bg-current animate-pulse' : 'bg-slate-600'}`} />

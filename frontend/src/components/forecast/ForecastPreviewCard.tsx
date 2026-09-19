@@ -347,7 +347,7 @@ export function ForecastPreviewCard() {
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-cyan-400" />
                 <span className="text-xs sm:text-sm font-semibold text-slate-200 font-mono">
-                  Temporal Lookahead Progression (T₀ = {timelineData ? new Date(timelineData.forecast_timestamp).toLocaleTimeString() : '...'})
+                  Temporal Lookahead Progression (T₀ = {timelineData && timelineData.forecast_timestamp ? new Date(timelineData.forecast_timestamp).toLocaleTimeString() : 'Awaiting Ingestion'})
                 </span>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
@@ -374,9 +374,9 @@ export function ForecastPreviewCard() {
                   const hData = timelineData?.horizons?.find(h => h.horizon_minutes === h_min);
                   const isSelected = selectedHorizon === h_min;
                   const isAlert = Boolean(hData?.binary_alert_decision);
-                  const prob = hData ? (hData.calibrated_probability * 100).toFixed(1) : '--';
+                  const prob = hData ? (hData.calibrated_probability * 100).toFixed(1) : 'N/A';
                   const thresh = hData ? (hData.decision_threshold * 100).toFixed(1) : '50.0';
-                  const targetTime = hData?.target_timestamp ? new Date(hData.target_timestamp).toLocaleTimeString() : '...';
+                  const targetTime = hData?.target_timestamp ? new Date(hData.target_timestamp).toLocaleTimeString() : '—';
                   const delta = hData?.probability_delta_from_previous_horizon;
 
                   return (
@@ -394,13 +394,17 @@ export function ForecastPreviewCard() {
                       {/* Header */}
                       <div className="flex items-center justify-between mb-2.5">
                         <span className="text-xs font-mono font-bold text-slate-200 flex items-center gap-1.5">
-                          <span className={`w-2 h-2 rounded-full ${isAlert ? 'bg-rose-400 animate-pulse' : 'bg-cyan-400'}`} />
+                          <span className={`w-2 h-2 rounded-full ${isAlert ? 'bg-rose-400 animate-pulse' : hData ? 'bg-cyan-400' : 'bg-slate-500'}`} />
                           +{h_min}m Horizon
                         </span>
                         <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
-                          isAlert ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 font-semibold' : 'bg-slate-900/80 text-slate-400 border-white/[0.06]'
+                          isAlert 
+                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 font-semibold' 
+                            : hData 
+                            ? 'bg-slate-900/80 text-emerald-300 border-emerald-800/40' 
+                            : 'bg-slate-900/80 text-slate-400 border-white/[0.06]'
                         }`}>
-                          {isAlert ? 'ALERT ACTIVE' : 'NOMINAL'}
+                          {isAlert ? 'ALERT ACTIVE' : hData ? 'NOMINAL' : 'AWAITING TELEMETRY'}
                         </span>
                       </div>
 
@@ -414,20 +418,29 @@ export function ForecastPreviewCard() {
                       <div className="space-y-1.5 mb-3">
                         <div className="flex justify-between text-xs font-mono">
                           <span className="text-slate-400">Calibrated Risk:</span>
-                          <span className={`font-bold ${isAlert ? 'text-rose-400' : 'text-slate-100'}`}>{prob}%</span>
+                          <span className={`font-bold ${isAlert ? 'text-rose-400' : hData ? 'text-slate-100' : 'text-slate-400'}`}>
+                            {hData ? `${prob}%` : 'N/A'}
+                          </span>
                         </div>
                         <div className="w-full bg-slate-900/80 h-1.5 rounded-full overflow-hidden border border-white/[0.04]">
                           <div 
-                            className={`h-full transition-all duration-500 rounded-full ${isAlert ? 'bg-rose-500' : 'bg-cyan-400'}`}
-                            style={{ width: `${Math.min(100, Math.max(0, Number(prob)))}%` }}
+                            className={`h-full transition-all duration-500 rounded-full ${isAlert ? 'bg-rose-500' : hData ? 'bg-cyan-400' : 'bg-slate-700/40'}`}
+                            style={{ width: hData ? `${Math.min(100, Math.max(0, Number(prob)))}%` : '0%' }}
                           />
                         </div>
+                        {!hData && (
+                          <span className="text-[9px] font-mono text-slate-400 block pt-0.5">
+                            Awaiting validated telemetry
+                          </span>
+                        )}
                       </div>
 
                       {/* Threshold and Delta */}
                       <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2.5 border-t border-white/[0.06]">
-                        <span className="text-slate-500">Threshold: {thresh}%</span>
-                        {delta !== null && delta !== undefined && (
+                        <span className="text-slate-400">
+                          Threshold: {thresh}% {hData ? '' : '(Unevaluated)'}
+                        </span>
+                        {hData && delta !== null && delta !== undefined && (
                           <span className={`flex items-center gap-0.5 font-medium ${delta > 0 ? 'text-rose-400' : delta < 0 ? 'text-emerald-400' : 'text-slate-500'}`}>
                             {delta > 0 ? <TrendingUp className="w-3 h-3" /> : delta < 0 ? <TrendingDown className="w-3 h-3" /> : null}
                             {delta > 0 ? `+${(delta * 100).toFixed(1)}%` : `${(delta * 100).toFixed(1)}%`}
@@ -441,8 +454,8 @@ export function ForecastPreviewCard() {
             </div>
           </div>
 
-          {/* Selected Horizon Deep Dive (Animated Transition on Horizon Change) */}
-          {activeHorizon && (
+          {/* Selected Horizon Deep Dive or Truthful Empty State */}
+          {activeHorizon ? (
             <div key={selectedHorizon} className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-tab-content">
               {/* Left 2 Cols: Risk Metrics & TreeSHAP Attribution */}
               <div className="lg:col-span-2 space-y-6">
@@ -556,6 +569,18 @@ export function ForecastPreviewCard() {
                   )}
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="glass-panel p-8 rounded-2xl border border-glass-border text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-400/20 text-cyan-400 flex items-center justify-center mx-auto shadow-sm">
+                <BrainCircuit className="w-6 h-6" />
+              </div>
+              <h3 className="text-sm font-semibold text-slate-200">
+                Awaiting Telemetry Stream for Feature Attribution
+              </h3>
+              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                Ingest live network traffic or upload a PCAP capture on the Telemetry page to evaluate calibrated risk probabilities, empirical lead times, and TreeSHAP feature attributions across all lookahead horizons.
+              </p>
             </div>
           )}
         </div>
