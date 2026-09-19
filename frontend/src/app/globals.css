@@ -1,0 +1,254 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #06080c;
+  --foreground: #f1f5f9;
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(6, 182, 212, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(99, 102, 241, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 0% 50%, rgba(20, 184, 166, 0.025) 0%, transparent 50%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* ==========================================================================
+   Apple Liquid Glass Architecture (5-Level Depth System)
+   ========================================================================== */
+
+/* Level 1: Atmospheric Background Base */
+.glass-base {
+  background: rgba(8, 12, 22, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Level 2: Floating Navigation Island */
+.glass-nav {
+  background: rgba(10, 15, 26, 0.65);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 20px 40px -15px rgba(0, 0, 0, 0.7),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Level 3: Primary Structural Glass Panels */
+.glass-panel {
+  background: rgba(12, 17, 30, 0.50);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 
+    0 16px 36px -8px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Level 3 Cards: Hoverable Interactive Glass Cards */
+.glass-card {
+  background: rgba(13, 19, 33, 0.48);
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 
+    0 8px 24px -4px rgba(0, 0, 0, 0.40),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  isolation: isolate;
+}
+
+.glass-card:hover {
+  background: rgba(17, 24, 42, 0.60);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 16px 32px -6px rgba(0, 0, 0, 0.55),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Level 4: Elevated & Selected Glass Surfaces */
+.glass-elevated {
+  background: rgba(16, 23, 40, 0.68);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  box-shadow: 
+    0 16px 36px -8px rgba(0, 0, 0, 0.60),
+    0 0 18px -4px rgba(6, 182, 212, 0.12),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.18);
+  isolation: isolate;
+}
+
+/* Level 5: Glass Pills & Badges */
+.glass-pill {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Tactile Interactive Buttons */
+.glass-button {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.glass-button:active {
+  transform: translateY(0) scale(0.98);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Continuous Liquid Glass Navigation System */
+.liquid-nav-island {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 16px;
+  background: rgba(10, 16, 28, 0.45);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 12px 32px -8px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10);
+}
+
+/* Floating Glass Indicator: Smooth Physical Light Tile */
+.liquid-nav-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(6, 182, 212, 0.10) 50%, rgba(14, 165, 233, 0.06) 100%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 
+    0 4px 16px -2px rgba(0, 0, 0, 0.35),
+    0 0 16px -4px rgba(6, 182, 212, 0.14),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.20);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), width 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Inactive Tab Button */
+.liquid-nav-tab {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 11px;
+  font-size: 0.8125rem;
+  font-weight: 450;
+  line-height: 1.25rem;
+  color: #94a3b8;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: color 0.22s ease, background-color 0.22s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+}
+
+.liquid-nav-tab:hover {
+  color: #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.035);
+}
+
+.liquid-nav-tab.is-active {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.liquid-nav-tab:active {
+  transform: scale(0.98);
+}
+
+.liquid-nav-tab:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.5);
+}
+
+/* Legacy segmented-track fallback support */
+.segmented-track {
+  background: rgba(10, 16, 28, 0.45);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Smooth Content Transitions */
+@keyframes contentFadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-tab-content {
+  animation: contentFadeSlide 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-tab-content,
+  .liquid-nav-indicator,
+  .liquid-nav-tab,
+  .glass-card,
+  .glass-button {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* Custom Refined Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(6, 8, 12, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.20);
+}

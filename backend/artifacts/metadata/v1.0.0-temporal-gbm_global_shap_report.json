@@ -1,0 +1,1691 @@
+{
+  "model_version": "v1.0.0-temporal-gbm",
+  "schema_version": "v1.0.0",
+  "evaluated_samples_count": 433,
+  "generated_at": "2026-09-18T18:13:26.174287+00:00",
+  "top_global_features": [
+    {
+      "feature_name": "unique_source_ips",
+      "feature_index": 20,
+      "mean_abs_shap": 0.70918,
+      "unit": "count",
+      "description": "Count of unique source IP addresses active in window",
+      "rank": 1
+    },
+    {
+      "feature_name": "packet_length_std",
+      "feature_index": 13,
+      "mean_abs_shap": 0.41744,
+      "unit": "bytes",
+      "description": "Standard deviation of packet lengths in bytes",
+      "rank": 2
+    },
+    {
+      "feature_name": "entropy_dest_ports",
+      "feature_index": 27,
+      "mean_abs_shap": 0.35544,
+      "unit": "bits",
+      "description": "Shannon entropy of destination port distribution",
+      "rank": 3
+    },
+    {
+      "feature_name": "flow_volume",
+      "feature_index": 0,
+      "mean_abs_shap": 0.29158,
+      "unit": "flows/window",
+      "description": "Total distinct network bidirectional flows active in observation window",
+      "rank": 4
+    },
+    {
+      "feature_name": "entropy_source_ips",
+      "feature_index": 24,
+      "mean_abs_shap": 0.21946,
+      "unit": "bits",
+      "description": "Shannon entropy of source IP distribution: H(X) = -sum(p * log2(p))",
+      "rank": 5
+    },
+    {
+      "feature_name": "packet_volume",
+      "feature_index": 1,
+      "mean_abs_shap": 0.21428,
+      "unit": "packets/window",
+      "description": "Total aggregate packet count across all flows in observation window",
+      "rank": 6
+    },
+    {
+      "feature_name": "byte_volume",
+      "feature_index": 2,
+      "mean_abs_shap": 0.19784,
+      "unit": "bytes/window",
+      "description": "Total aggregate payload and header bytes transferred in observation window",
+      "rank": 7
+    },
+    {
+      "feature_name": "mean_packet_length",
+      "feature_index": 12,
+      "mean_abs_shap": 0.16271,
+      "unit": "bytes/packet",
+      "description": "Mean packet length in bytes across all flows in the window",
+      "rank": 8
+    },
+    {
+      "feature_name": "behavioral_anomaly_score",
+      "feature_index": 36,
+      "mean_abs_shap": 0.15235,
+      "unit": "score [0.0, 1.0]",
+      "description": "Unsupervised Isolation Forest perimeter deviation score relative to nominal traffic",
+      "rank": 9
+    },
+    {
+      "feature_name": "ack_count",
+      "feature_index": 16,
+      "mean_abs_shap": 0.14963,
+      "unit": "packets",
+      "description": "Total TCP packets with ACK flag set in observation window",
+      "rank": 10
+    }
+  ],
+  "horizon_rankings": {
+    "5": [
+      {
+        "feature_name": "unique_source_ips",
+        "feature_index": 20,
+        "mean_abs_shap": 0.65204,
+        "unit": "count",
+        "description": "Count of unique source IP addresses active in window",
+        "rank": 1
+      },
+      {
+        "feature_name": "entropy_dest_ips",
+        "feature_index": 25,
+        "mean_abs_shap": 0.18305,
+        "unit": "bits",
+        "description": "Shannon entropy of destination IP distribution",
+        "rank": 2
+      },
+      {
+        "feature_name": "syn_count",
+        "feature_index": 14,
+        "mean_abs_shap": 0.16811,
+        "unit": "packets",
+        "description": "Total TCP packets with SYN flag set in observation window",
+        "rank": 3
+      },
+      {
+        "feature_name": "packet_length_std",
+        "feature_index": 13,
+        "mean_abs_shap": 0.15435,
+        "unit": "bytes",
+        "description": "Standard deviation of packet lengths in bytes",
+        "rank": 4
+      },
+      {
+        "feature_name": "flow_volume",
+        "feature_index": 0,
+        "mean_abs_shap": 0.14547,
+        "unit": "flows/window",
+        "description": "Total distinct network bidirectional flows active in observation window",
+        "rank": 5
+      },
+      {
+        "feature_name": "packet_volume",
+        "feature_index": 1,
+        "mean_abs_shap": 0.07244,
+        "unit": "packets/window",
+        "description": "Total aggregate packet count across all flows in observation window",
+        "rank": 6
+      },
+      {
+        "feature_name": "duration_variance",
+        "feature_index": 6,
+        "mean_abs_shap": 0.06716,
+        "unit": "ms\u00b2",
+        "description": "Statistical variance of connection lifetimes across flows in the window",
+        "rank": 7
+      },
+      {
+        "feature_name": "syn_ack_ratio",
+        "feature_index": 18,
+        "mean_abs_shap": 0.06087,
+        "unit": "ratio",
+        "description": "Ratio of SYN packets to ACK packets; ratio > 1 indicates incomplete handshakes",
+        "rank": 8
+      },
+      {
+        "feature_name": "burst_score_delta",
+        "feature_index": 34,
+        "mean_abs_shap": 0.05825,
+        "unit": "ratio",
+        "description": "Change in peak-to-mean traffic burstiness ratio across temporal windows",
+        "rank": 9
+      },
+      {
+        "feature_name": "dest_concentration_delta",
+        "feature_index": 35,
+        "mean_abs_shap": 0.05361,
+        "unit": "ratio",
+        "description": "Rate of change in traffic destination concentration ratio",
+        "rank": 10
+      },
+      {
+        "feature_name": "byte_volume",
+        "feature_index": 2,
+        "mean_abs_shap": 0.05228,
+        "unit": "bytes/window",
+        "description": "Total aggregate payload and header bytes transferred in observation window",
+        "rank": 11
+      },
+      {
+        "feature_name": "behavioral_anomaly_score",
+        "feature_index": 36,
+        "mean_abs_shap": 0.05153,
+        "unit": "score [0.0, 1.0]",
+        "description": "Unsupervised Isolation Forest perimeter deviation score relative to nominal traffic",
+        "rank": 12
+      },
+      {
+        "feature_name": "entropy_dest_ports",
+        "feature_index": 27,
+        "mean_abs_shap": 0.04903,
+        "unit": "bits",
+        "description": "Shannon entropy of destination port distribution",
+        "rank": 13
+      },
+      {
+        "feature_name": "syn_rate_acceleration",
+        "feature_index": 33,
+        "mean_abs_shap": 0.04901,
+        "unit": "packets/s\u00b2",
+        "description": "Second derivative / acceleration of TCP SYN initiation rate",
+        "rank": 14
+      },
+      {
+        "feature_name": "mean_packet_length",
+        "feature_index": 12,
+        "mean_abs_shap": 0.0402,
+        "unit": "bytes/packet",
+        "description": "Mean packet length in bytes across all flows in the window",
+        "rank": 15
+      },
+      {
+        "feature_name": "mean_flow_duration_ms",
+        "feature_index": 5,
+        "mean_abs_shap": 0.02484,
+        "unit": "ms",
+        "description": "Average flow connection duration in milliseconds",
+        "rank": 16
+      },
+      {
+        "feature_name": "entropy_source_ips",
+        "feature_index": 24,
+        "mean_abs_shap": 0.02428,
+        "unit": "bits",
+        "description": "Shannon entropy of source IP distribution: H(X) = -sum(p * log2(p))",
+        "rank": 17
+      },
+      {
+        "feature_name": "delta_byte_rate",
+        "feature_index": 30,
+        "mean_abs_shap": 0.02324,
+        "unit": "bytes/s",
+        "description": "Step change in byte throughput relative to previous temporal window",
+        "rank": 18
+      },
+      {
+        "feature_name": "entropy_change_src_ips",
+        "feature_index": 32,
+        "mean_abs_shap": 0.01557,
+        "unit": "bits",
+        "description": "Rate of change in source IP entropy across temporal windows",
+        "rank": 19
+      },
+      {
+        "feature_name": "packet_rate_slope",
+        "feature_index": 29,
+        "mean_abs_shap": 0.01553,
+        "unit": "packets/s\u00b2",
+        "description": "First-order linear regression slope of packet rates over past k windows",
+        "rank": 20
+      },
+      {
+        "feature_name": "entropy_change_dest_ports",
+        "feature_index": 31,
+        "mean_abs_shap": 0.01402,
+        "unit": "bits",
+        "description": "Rate of change in destination port entropy across temporal windows",
+        "rank": 21
+      },
+      {
+        "feature_name": "ack_count",
+        "feature_index": 16,
+        "mean_abs_shap": 0.00884,
+        "unit": "packets",
+        "description": "Total TCP packets with ACK flag set in observation window",
+        "rank": 22
+      },
+      {
+        "feature_name": "delta_packet_rate",
+        "feature_index": 28,
+        "mean_abs_shap": 0.00868,
+        "unit": "packets/s",
+        "description": "Step change in packet rate relative to previous temporal window",
+        "rank": 23
+      },
+      {
+        "feature_name": "unique_source_ports",
+        "feature_index": 22,
+        "mean_abs_shap": 0.00371,
+        "unit": "count",
+        "description": "Count of unique ephemeral source ports observed",
+        "rank": 24
+      },
+      {
+        "feature_name": "unique_destination_ports",
+        "feature_index": 23,
+        "mean_abs_shap": 0.001,
+        "unit": "count",
+        "description": "Count of unique destination service ports accessed",
+        "rank": 25
+      },
+      {
+        "feature_name": "packets_per_second",
+        "feature_index": 3,
+        "mean_abs_shap": 0.0,
+        "unit": "packets/s",
+        "description": "Mean packet transmission rate across the window duration",
+        "rank": 26
+      },
+      {
+        "feature_name": "bytes_per_second",
+        "feature_index": 4,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes/s",
+        "description": "Mean volumetric byte throughput across the window duration",
+        "rank": 27
+      },
+      {
+        "feature_name": "forward_packets_total",
+        "feature_index": 7,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total client-to-server (forward) packets transmitted",
+        "rank": 28
+      },
+      {
+        "feature_name": "backward_packets_total",
+        "feature_index": 8,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total server-to-client (backward) response packets transmitted",
+        "rank": 29
+      },
+      {
+        "feature_name": "forward_bytes_total",
+        "feature_index": 9,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes",
+        "description": "Total client-to-server outbound bytes transferred",
+        "rank": 30
+      },
+      {
+        "feature_name": "backward_bytes_total",
+        "feature_index": 10,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes",
+        "description": "Total server-to-client inbound response bytes transferred",
+        "rank": 31
+      },
+      {
+        "feature_name": "forward_backward_ratio",
+        "feature_index": 11,
+        "mean_abs_shap": 0.0,
+        "unit": "ratio",
+        "description": "Ratio of forward to backward packets; high ratios indicate unidirectional traffic",
+        "rank": 32
+      },
+      {
+        "feature_name": "syn_rate",
+        "feature_index": 15,
+        "mean_abs_shap": 0.0,
+        "unit": "packets/s",
+        "description": "Rate of TCP SYN packet initiation per second",
+        "rank": 33
+      },
+      {
+        "feature_name": "rst_count",
+        "feature_index": 17,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total TCP connection reset (RST) packets observed",
+        "rank": 34
+      },
+      {
+        "feature_name": "rst_ratio",
+        "feature_index": 19,
+        "mean_abs_shap": 0.0,
+        "unit": "ratio",
+        "description": "Proportion of flows terminated abnormally with RST flags",
+        "rank": 35
+      },
+      {
+        "feature_name": "unique_destination_ips",
+        "feature_index": 21,
+        "mean_abs_shap": 0.0,
+        "unit": "count",
+        "description": "Count of unique destination IP addresses targeted in window",
+        "rank": 36
+      },
+      {
+        "feature_name": "entropy_source_ports",
+        "feature_index": 26,
+        "mean_abs_shap": 0.0,
+        "unit": "bits",
+        "description": "Shannon entropy of source port distribution",
+        "rank": 37
+      }
+    ],
+    "15": [
+      {
+        "feature_name": "unique_source_ips",
+        "feature_index": 20,
+        "mean_abs_shap": 1.53493,
+        "unit": "count",
+        "description": "Count of unique source IP addresses active in window",
+        "rank": 1
+      },
+      {
+        "feature_name": "flow_volume",
+        "feature_index": 0,
+        "mean_abs_shap": 0.69945,
+        "unit": "flows/window",
+        "description": "Total distinct network bidirectional flows active in observation window",
+        "rank": 2
+      },
+      {
+        "feature_name": "packet_length_std",
+        "feature_index": 13,
+        "mean_abs_shap": 0.42688,
+        "unit": "bytes",
+        "description": "Standard deviation of packet lengths in bytes",
+        "rank": 3
+      },
+      {
+        "feature_name": "packet_volume",
+        "feature_index": 1,
+        "mean_abs_shap": 0.39978,
+        "unit": "packets/window",
+        "description": "Total aggregate packet count across all flows in observation window",
+        "rank": 4
+      },
+      {
+        "feature_name": "syn_count",
+        "feature_index": 14,
+        "mean_abs_shap": 0.14536,
+        "unit": "packets",
+        "description": "Total TCP packets with SYN flag set in observation window",
+        "rank": 5
+      },
+      {
+        "feature_name": "mean_packet_length",
+        "feature_index": 12,
+        "mean_abs_shap": 0.13762,
+        "unit": "bytes/packet",
+        "description": "Mean packet length in bytes across all flows in the window",
+        "rank": 6
+      },
+      {
+        "feature_name": "behavioral_anomaly_score",
+        "feature_index": 36,
+        "mean_abs_shap": 0.13299,
+        "unit": "score [0.0, 1.0]",
+        "description": "Unsupervised Isolation Forest perimeter deviation score relative to nominal traffic",
+        "rank": 7
+      },
+      {
+        "feature_name": "byte_volume",
+        "feature_index": 2,
+        "mean_abs_shap": 0.11528,
+        "unit": "bytes/window",
+        "description": "Total aggregate payload and header bytes transferred in observation window",
+        "rank": 8
+      },
+      {
+        "feature_name": "ack_count",
+        "feature_index": 16,
+        "mean_abs_shap": 0.1088,
+        "unit": "packets",
+        "description": "Total TCP packets with ACK flag set in observation window",
+        "rank": 9
+      },
+      {
+        "feature_name": "entropy_change_src_ips",
+        "feature_index": 32,
+        "mean_abs_shap": 0.10175,
+        "unit": "bits",
+        "description": "Rate of change in source IP entropy across temporal windows",
+        "rank": 10
+      },
+      {
+        "feature_name": "mean_flow_duration_ms",
+        "feature_index": 5,
+        "mean_abs_shap": 0.07043,
+        "unit": "ms",
+        "description": "Average flow connection duration in milliseconds",
+        "rank": 11
+      },
+      {
+        "feature_name": "dest_concentration_delta",
+        "feature_index": 35,
+        "mean_abs_shap": 0.05458,
+        "unit": "ratio",
+        "description": "Rate of change in traffic destination concentration ratio",
+        "rank": 12
+      },
+      {
+        "feature_name": "delta_packet_rate",
+        "feature_index": 28,
+        "mean_abs_shap": 0.05134,
+        "unit": "packets/s",
+        "description": "Step change in packet rate relative to previous temporal window",
+        "rank": 13
+      },
+      {
+        "feature_name": "packet_rate_slope",
+        "feature_index": 29,
+        "mean_abs_shap": 0.04447,
+        "unit": "packets/s\u00b2",
+        "description": "First-order linear regression slope of packet rates over past k windows",
+        "rank": 14
+      },
+      {
+        "feature_name": "entropy_source_ips",
+        "feature_index": 24,
+        "mean_abs_shap": 0.0366,
+        "unit": "bits",
+        "description": "Shannon entropy of source IP distribution: H(X) = -sum(p * log2(p))",
+        "rank": 15
+      },
+      {
+        "feature_name": "duration_variance",
+        "feature_index": 6,
+        "mean_abs_shap": 0.03086,
+        "unit": "ms\u00b2",
+        "description": "Statistical variance of connection lifetimes across flows in the window",
+        "rank": 16
+      },
+      {
+        "feature_name": "entropy_dest_ips",
+        "feature_index": 25,
+        "mean_abs_shap": 0.03073,
+        "unit": "bits",
+        "description": "Shannon entropy of destination IP distribution",
+        "rank": 17
+      },
+      {
+        "feature_name": "delta_byte_rate",
+        "feature_index": 30,
+        "mean_abs_shap": 0.02729,
+        "unit": "bytes/s",
+        "description": "Step change in byte throughput relative to previous temporal window",
+        "rank": 18
+      },
+      {
+        "feature_name": "entropy_change_dest_ports",
+        "feature_index": 31,
+        "mean_abs_shap": 0.02341,
+        "unit": "bits",
+        "description": "Rate of change in destination port entropy across temporal windows",
+        "rank": 19
+      },
+      {
+        "feature_name": "syn_rate_acceleration",
+        "feature_index": 33,
+        "mean_abs_shap": 0.02091,
+        "unit": "packets/s\u00b2",
+        "description": "Second derivative / acceleration of TCP SYN initiation rate",
+        "rank": 20
+      },
+      {
+        "feature_name": "burst_score_delta",
+        "feature_index": 34,
+        "mean_abs_shap": 0.01959,
+        "unit": "ratio",
+        "description": "Change in peak-to-mean traffic burstiness ratio across temporal windows",
+        "rank": 21
+      },
+      {
+        "feature_name": "entropy_dest_ports",
+        "feature_index": 27,
+        "mean_abs_shap": 0.01934,
+        "unit": "bits",
+        "description": "Shannon entropy of destination port distribution",
+        "rank": 22
+      },
+      {
+        "feature_name": "syn_ack_ratio",
+        "feature_index": 18,
+        "mean_abs_shap": 0.01021,
+        "unit": "ratio",
+        "description": "Ratio of SYN packets to ACK packets; ratio > 1 indicates incomplete handshakes",
+        "rank": 23
+      },
+      {
+        "feature_name": "unique_destination_ports",
+        "feature_index": 23,
+        "mean_abs_shap": 0.00496,
+        "unit": "count",
+        "description": "Count of unique destination service ports accessed",
+        "rank": 24
+      },
+      {
+        "feature_name": "entropy_source_ports",
+        "feature_index": 26,
+        "mean_abs_shap": 0.00108,
+        "unit": "bits",
+        "description": "Shannon entropy of source port distribution",
+        "rank": 25
+      },
+      {
+        "feature_name": "unique_source_ports",
+        "feature_index": 22,
+        "mean_abs_shap": 0.00043,
+        "unit": "count",
+        "description": "Count of unique ephemeral source ports observed",
+        "rank": 26
+      },
+      {
+        "feature_name": "packets_per_second",
+        "feature_index": 3,
+        "mean_abs_shap": 0.0,
+        "unit": "packets/s",
+        "description": "Mean packet transmission rate across the window duration",
+        "rank": 27
+      },
+      {
+        "feature_name": "bytes_per_second",
+        "feature_index": 4,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes/s",
+        "description": "Mean volumetric byte throughput across the window duration",
+        "rank": 28
+      },
+      {
+        "feature_name": "forward_packets_total",
+        "feature_index": 7,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total client-to-server (forward) packets transmitted",
+        "rank": 29
+      },
+      {
+        "feature_name": "backward_packets_total",
+        "feature_index": 8,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total server-to-client (backward) response packets transmitted",
+        "rank": 30
+      },
+      {
+        "feature_name": "forward_bytes_total",
+        "feature_index": 9,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes",
+        "description": "Total client-to-server outbound bytes transferred",
+        "rank": 31
+      },
+      {
+        "feature_name": "backward_bytes_total",
+        "feature_index": 10,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes",
+        "description": "Total server-to-client inbound response bytes transferred",
+        "rank": 32
+      },
+      {
+        "feature_name": "forward_backward_ratio",
+        "feature_index": 11,
+        "mean_abs_shap": 0.0,
+        "unit": "ratio",
+        "description": "Ratio of forward to backward packets; high ratios indicate unidirectional traffic",
+        "rank": 33
+      },
+      {
+        "feature_name": "syn_rate",
+        "feature_index": 15,
+        "mean_abs_shap": 0.0,
+        "unit": "packets/s",
+        "description": "Rate of TCP SYN packet initiation per second",
+        "rank": 34
+      },
+      {
+        "feature_name": "rst_count",
+        "feature_index": 17,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total TCP connection reset (RST) packets observed",
+        "rank": 35
+      },
+      {
+        "feature_name": "rst_ratio",
+        "feature_index": 19,
+        "mean_abs_shap": 0.0,
+        "unit": "ratio",
+        "description": "Proportion of flows terminated abnormally with RST flags",
+        "rank": 36
+      },
+      {
+        "feature_name": "unique_destination_ips",
+        "feature_index": 21,
+        "mean_abs_shap": 0.0,
+        "unit": "count",
+        "description": "Count of unique destination IP addresses targeted in window",
+        "rank": 37
+      }
+    ],
+    "30": [
+      {
+        "feature_name": "entropy_dest_ports",
+        "feature_index": 27,
+        "mean_abs_shap": 0.68289,
+        "unit": "bits",
+        "description": "Shannon entropy of destination port distribution",
+        "rank": 1
+      },
+      {
+        "feature_name": "entropy_source_ips",
+        "feature_index": 24,
+        "mean_abs_shap": 0.49415,
+        "unit": "bits",
+        "description": "Shannon entropy of source IP distribution: H(X) = -sum(p * log2(p))",
+        "rank": 2
+      },
+      {
+        "feature_name": "unique_source_ips",
+        "feature_index": 20,
+        "mean_abs_shap": 0.43358,
+        "unit": "count",
+        "description": "Count of unique source IP addresses active in window",
+        "rank": 3
+      },
+      {
+        "feature_name": "packet_length_std",
+        "feature_index": 13,
+        "mean_abs_shap": 0.41834,
+        "unit": "bytes",
+        "description": "Standard deviation of packet lengths in bytes",
+        "rank": 4
+      },
+      {
+        "feature_name": "byte_volume",
+        "feature_index": 2,
+        "mean_abs_shap": 0.33345,
+        "unit": "bytes/window",
+        "description": "Total aggregate payload and header bytes transferred in observation window",
+        "rank": 5
+      },
+      {
+        "feature_name": "mean_packet_length",
+        "feature_index": 12,
+        "mean_abs_shap": 0.31388,
+        "unit": "bytes/packet",
+        "description": "Mean packet length in bytes across all flows in the window",
+        "rank": 6
+      },
+      {
+        "feature_name": "duration_variance",
+        "feature_index": 6,
+        "mean_abs_shap": 0.30823,
+        "unit": "ms\u00b2",
+        "description": "Statistical variance of connection lifetimes across flows in the window",
+        "rank": 7
+      },
+      {
+        "feature_name": "flow_volume",
+        "feature_index": 0,
+        "mean_abs_shap": 0.2853,
+        "unit": "flows/window",
+        "description": "Total distinct network bidirectional flows active in observation window",
+        "rank": 8
+      },
+      {
+        "feature_name": "packet_volume",
+        "feature_index": 1,
+        "mean_abs_shap": 0.26693,
+        "unit": "packets/window",
+        "description": "Total aggregate packet count across all flows in observation window",
+        "rank": 9
+      },
+      {
+        "feature_name": "ack_count",
+        "feature_index": 16,
+        "mean_abs_shap": 0.25505,
+        "unit": "packets",
+        "description": "Total TCP packets with ACK flag set in observation window",
+        "rank": 10
+      },
+      {
+        "feature_name": "behavioral_anomaly_score",
+        "feature_index": 36,
+        "mean_abs_shap": 0.24137,
+        "unit": "score [0.0, 1.0]",
+        "description": "Unsupervised Isolation Forest perimeter deviation score relative to nominal traffic",
+        "rank": 11
+      },
+      {
+        "feature_name": "syn_ack_ratio",
+        "feature_index": 18,
+        "mean_abs_shap": 0.20599,
+        "unit": "ratio",
+        "description": "Ratio of SYN packets to ACK packets; ratio > 1 indicates incomplete handshakes",
+        "rank": 12
+      },
+      {
+        "feature_name": "dest_concentration_delta",
+        "feature_index": 35,
+        "mean_abs_shap": 0.16899,
+        "unit": "ratio",
+        "description": "Rate of change in traffic destination concentration ratio",
+        "rank": 13
+      },
+      {
+        "feature_name": "entropy_dest_ips",
+        "feature_index": 25,
+        "mean_abs_shap": 0.16673,
+        "unit": "bits",
+        "description": "Shannon entropy of destination IP distribution",
+        "rank": 14
+      },
+      {
+        "feature_name": "delta_byte_rate",
+        "feature_index": 30,
+        "mean_abs_shap": 0.13414,
+        "unit": "bytes/s",
+        "description": "Step change in byte throughput relative to previous temporal window",
+        "rank": 15
+      },
+      {
+        "feature_name": "mean_flow_duration_ms",
+        "feature_index": 5,
+        "mean_abs_shap": 0.12378,
+        "unit": "ms",
+        "description": "Average flow connection duration in milliseconds",
+        "rank": 16
+      },
+      {
+        "feature_name": "unique_destination_ports",
+        "feature_index": 23,
+        "mean_abs_shap": 0.11827,
+        "unit": "count",
+        "description": "Count of unique destination service ports accessed",
+        "rank": 17
+      },
+      {
+        "feature_name": "entropy_change_src_ips",
+        "feature_index": 32,
+        "mean_abs_shap": 0.11659,
+        "unit": "bits",
+        "description": "Rate of change in source IP entropy across temporal windows",
+        "rank": 18
+      },
+      {
+        "feature_name": "entropy_change_dest_ports",
+        "feature_index": 31,
+        "mean_abs_shap": 0.1132,
+        "unit": "bits",
+        "description": "Rate of change in destination port entropy across temporal windows",
+        "rank": 19
+      },
+      {
+        "feature_name": "syn_count",
+        "feature_index": 14,
+        "mean_abs_shap": 0.09803,
+        "unit": "packets",
+        "description": "Total TCP packets with SYN flag set in observation window",
+        "rank": 20
+      },
+      {
+        "feature_name": "burst_score_delta",
+        "feature_index": 34,
+        "mean_abs_shap": 0.09759,
+        "unit": "ratio",
+        "description": "Change in peak-to-mean traffic burstiness ratio across temporal windows",
+        "rank": 21
+      },
+      {
+        "feature_name": "packet_rate_slope",
+        "feature_index": 29,
+        "mean_abs_shap": 0.07903,
+        "unit": "packets/s\u00b2",
+        "description": "First-order linear regression slope of packet rates over past k windows",
+        "rank": 22
+      },
+      {
+        "feature_name": "delta_packet_rate",
+        "feature_index": 28,
+        "mean_abs_shap": 0.07269,
+        "unit": "packets/s",
+        "description": "Step change in packet rate relative to previous temporal window",
+        "rank": 23
+      },
+      {
+        "feature_name": "syn_rate_acceleration",
+        "feature_index": 33,
+        "mean_abs_shap": 0.06133,
+        "unit": "packets/s\u00b2",
+        "description": "Second derivative / acceleration of TCP SYN initiation rate",
+        "rank": 24
+      },
+      {
+        "feature_name": "unique_source_ports",
+        "feature_index": 22,
+        "mean_abs_shap": 0.0062,
+        "unit": "count",
+        "description": "Count of unique ephemeral source ports observed",
+        "rank": 25
+      },
+      {
+        "feature_name": "unique_destination_ips",
+        "feature_index": 21,
+        "mean_abs_shap": 0.00192,
+        "unit": "count",
+        "description": "Count of unique destination IP addresses targeted in window",
+        "rank": 26
+      },
+      {
+        "feature_name": "packets_per_second",
+        "feature_index": 3,
+        "mean_abs_shap": 0.0,
+        "unit": "packets/s",
+        "description": "Mean packet transmission rate across the window duration",
+        "rank": 27
+      },
+      {
+        "feature_name": "bytes_per_second",
+        "feature_index": 4,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes/s",
+        "description": "Mean volumetric byte throughput across the window duration",
+        "rank": 28
+      },
+      {
+        "feature_name": "forward_packets_total",
+        "feature_index": 7,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total client-to-server (forward) packets transmitted",
+        "rank": 29
+      },
+      {
+        "feature_name": "backward_packets_total",
+        "feature_index": 8,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total server-to-client (backward) response packets transmitted",
+        "rank": 30
+      },
+      {
+        "feature_name": "forward_bytes_total",
+        "feature_index": 9,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes",
+        "description": "Total client-to-server outbound bytes transferred",
+        "rank": 31
+      },
+      {
+        "feature_name": "backward_bytes_total",
+        "feature_index": 10,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes",
+        "description": "Total server-to-client inbound response bytes transferred",
+        "rank": 32
+      },
+      {
+        "feature_name": "forward_backward_ratio",
+        "feature_index": 11,
+        "mean_abs_shap": 0.0,
+        "unit": "ratio",
+        "description": "Ratio of forward to backward packets; high ratios indicate unidirectional traffic",
+        "rank": 33
+      },
+      {
+        "feature_name": "syn_rate",
+        "feature_index": 15,
+        "mean_abs_shap": 0.0,
+        "unit": "packets/s",
+        "description": "Rate of TCP SYN packet initiation per second",
+        "rank": 34
+      },
+      {
+        "feature_name": "rst_count",
+        "feature_index": 17,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total TCP connection reset (RST) packets observed",
+        "rank": 35
+      },
+      {
+        "feature_name": "rst_ratio",
+        "feature_index": 19,
+        "mean_abs_shap": 0.0,
+        "unit": "ratio",
+        "description": "Proportion of flows terminated abnormally with RST flags",
+        "rank": 36
+      },
+      {
+        "feature_name": "entropy_source_ports",
+        "feature_index": 26,
+        "mean_abs_shap": 0.0,
+        "unit": "bits",
+        "description": "Shannon entropy of source port distribution",
+        "rank": 37
+      }
+    ],
+    "60": [
+      {
+        "feature_name": "entropy_dest_ports",
+        "feature_index": 27,
+        "mean_abs_shap": 0.67051,
+        "unit": "bits",
+        "description": "Shannon entropy of destination port distribution",
+        "rank": 1
+      },
+      {
+        "feature_name": "packet_length_std",
+        "feature_index": 13,
+        "mean_abs_shap": 0.67018,
+        "unit": "bytes",
+        "description": "Standard deviation of packet lengths in bytes",
+        "rank": 2
+      },
+      {
+        "feature_name": "entropy_source_ips",
+        "feature_index": 24,
+        "mean_abs_shap": 0.32281,
+        "unit": "bits",
+        "description": "Shannon entropy of source IP distribution: H(X) = -sum(p * log2(p))",
+        "rank": 3
+      },
+      {
+        "feature_name": "byte_volume",
+        "feature_index": 2,
+        "mean_abs_shap": 0.29034,
+        "unit": "bytes/window",
+        "description": "Total aggregate payload and header bytes transferred in observation window",
+        "rank": 4
+      },
+      {
+        "feature_name": "unique_destination_ports",
+        "feature_index": 23,
+        "mean_abs_shap": 0.27461,
+        "unit": "count",
+        "description": "Count of unique destination service ports accessed",
+        "rank": 5
+      },
+      {
+        "feature_name": "ack_count",
+        "feature_index": 16,
+        "mean_abs_shap": 0.22584,
+        "unit": "packets",
+        "description": "Total TCP packets with ACK flag set in observation window",
+        "rank": 6
+      },
+      {
+        "feature_name": "unique_source_ips",
+        "feature_index": 20,
+        "mean_abs_shap": 0.21618,
+        "unit": "count",
+        "description": "Count of unique source IP addresses active in window",
+        "rank": 7
+      },
+      {
+        "feature_name": "syn_ack_ratio",
+        "feature_index": 18,
+        "mean_abs_shap": 0.19164,
+        "unit": "ratio",
+        "description": "Ratio of SYN packets to ACK packets; ratio > 1 indicates incomplete handshakes",
+        "rank": 8
+      },
+      {
+        "feature_name": "behavioral_anomaly_score",
+        "feature_index": 36,
+        "mean_abs_shap": 0.1835,
+        "unit": "score [0.0, 1.0]",
+        "description": "Unsupervised Isolation Forest perimeter deviation score relative to nominal traffic",
+        "rank": 9
+      },
+      {
+        "feature_name": "dest_concentration_delta",
+        "feature_index": 35,
+        "mean_abs_shap": 0.16468,
+        "unit": "ratio",
+        "description": "Rate of change in traffic destination concentration ratio",
+        "rank": 10
+      },
+      {
+        "feature_name": "entropy_dest_ips",
+        "feature_index": 25,
+        "mean_abs_shap": 0.16137,
+        "unit": "bits",
+        "description": "Shannon entropy of destination IP distribution",
+        "rank": 11
+      },
+      {
+        "feature_name": "duration_variance",
+        "feature_index": 6,
+        "mean_abs_shap": 0.16104,
+        "unit": "ms\u00b2",
+        "description": "Statistical variance of connection lifetimes across flows in the window",
+        "rank": 12
+      },
+      {
+        "feature_name": "mean_packet_length",
+        "feature_index": 12,
+        "mean_abs_shap": 0.15913,
+        "unit": "bytes/packet",
+        "description": "Mean packet length in bytes across all flows in the window",
+        "rank": 13
+      },
+      {
+        "feature_name": "syn_count",
+        "feature_index": 14,
+        "mean_abs_shap": 0.15755,
+        "unit": "packets",
+        "description": "Total TCP packets with SYN flag set in observation window",
+        "rank": 14
+      },
+      {
+        "feature_name": "delta_byte_rate",
+        "feature_index": 30,
+        "mean_abs_shap": 0.12684,
+        "unit": "bytes/s",
+        "description": "Step change in byte throughput relative to previous temporal window",
+        "rank": 15
+      },
+      {
+        "feature_name": "packet_volume",
+        "feature_index": 1,
+        "mean_abs_shap": 0.11798,
+        "unit": "packets/window",
+        "description": "Total aggregate packet count across all flows in observation window",
+        "rank": 16
+      },
+      {
+        "feature_name": "entropy_change_dest_ports",
+        "feature_index": 31,
+        "mean_abs_shap": 0.10075,
+        "unit": "bits",
+        "description": "Rate of change in destination port entropy across temporal windows",
+        "rank": 17
+      },
+      {
+        "feature_name": "mean_flow_duration_ms",
+        "feature_index": 5,
+        "mean_abs_shap": 0.09662,
+        "unit": "ms",
+        "description": "Average flow connection duration in milliseconds",
+        "rank": 18
+      },
+      {
+        "feature_name": "entropy_change_src_ips",
+        "feature_index": 32,
+        "mean_abs_shap": 0.08797,
+        "unit": "bits",
+        "description": "Rate of change in source IP entropy across temporal windows",
+        "rank": 19
+      },
+      {
+        "feature_name": "burst_score_delta",
+        "feature_index": 34,
+        "mean_abs_shap": 0.08221,
+        "unit": "ratio",
+        "description": "Change in peak-to-mean traffic burstiness ratio across temporal windows",
+        "rank": 20
+      },
+      {
+        "feature_name": "delta_packet_rate",
+        "feature_index": 28,
+        "mean_abs_shap": 0.07386,
+        "unit": "packets/s",
+        "description": "Step change in packet rate relative to previous temporal window",
+        "rank": 21
+      },
+      {
+        "feature_name": "syn_rate_acceleration",
+        "feature_index": 33,
+        "mean_abs_shap": 0.06752,
+        "unit": "packets/s\u00b2",
+        "description": "Second derivative / acceleration of TCP SYN initiation rate",
+        "rank": 22
+      },
+      {
+        "feature_name": "packet_rate_slope",
+        "feature_index": 29,
+        "mean_abs_shap": 0.04913,
+        "unit": "packets/s\u00b2",
+        "description": "First-order linear regression slope of packet rates over past k windows",
+        "rank": 23
+      },
+      {
+        "feature_name": "flow_volume",
+        "feature_index": 0,
+        "mean_abs_shap": 0.0361,
+        "unit": "flows/window",
+        "description": "Total distinct network bidirectional flows active in observation window",
+        "rank": 24
+      },
+      {
+        "feature_name": "entropy_source_ports",
+        "feature_index": 26,
+        "mean_abs_shap": 0.00595,
+        "unit": "bits",
+        "description": "Shannon entropy of source port distribution",
+        "rank": 25
+      },
+      {
+        "feature_name": "unique_source_ports",
+        "feature_index": 22,
+        "mean_abs_shap": 0.00546,
+        "unit": "count",
+        "description": "Count of unique ephemeral source ports observed",
+        "rank": 26
+      },
+      {
+        "feature_name": "unique_destination_ips",
+        "feature_index": 21,
+        "mean_abs_shap": 0.00283,
+        "unit": "count",
+        "description": "Count of unique destination IP addresses targeted in window",
+        "rank": 27
+      },
+      {
+        "feature_name": "packets_per_second",
+        "feature_index": 3,
+        "mean_abs_shap": 0.0,
+        "unit": "packets/s",
+        "description": "Mean packet transmission rate across the window duration",
+        "rank": 28
+      },
+      {
+        "feature_name": "bytes_per_second",
+        "feature_index": 4,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes/s",
+        "description": "Mean volumetric byte throughput across the window duration",
+        "rank": 29
+      },
+      {
+        "feature_name": "forward_packets_total",
+        "feature_index": 7,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total client-to-server (forward) packets transmitted",
+        "rank": 30
+      },
+      {
+        "feature_name": "backward_packets_total",
+        "feature_index": 8,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total server-to-client (backward) response packets transmitted",
+        "rank": 31
+      },
+      {
+        "feature_name": "forward_bytes_total",
+        "feature_index": 9,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes",
+        "description": "Total client-to-server outbound bytes transferred",
+        "rank": 32
+      },
+      {
+        "feature_name": "backward_bytes_total",
+        "feature_index": 10,
+        "mean_abs_shap": 0.0,
+        "unit": "bytes",
+        "description": "Total server-to-client inbound response bytes transferred",
+        "rank": 33
+      },
+      {
+        "feature_name": "forward_backward_ratio",
+        "feature_index": 11,
+        "mean_abs_shap": 0.0,
+        "unit": "ratio",
+        "description": "Ratio of forward to backward packets; high ratios indicate unidirectional traffic",
+        "rank": 34
+      },
+      {
+        "feature_name": "syn_rate",
+        "feature_index": 15,
+        "mean_abs_shap": 0.0,
+        "unit": "packets/s",
+        "description": "Rate of TCP SYN packet initiation per second",
+        "rank": 35
+      },
+      {
+        "feature_name": "rst_count",
+        "feature_index": 17,
+        "mean_abs_shap": 0.0,
+        "unit": "packets",
+        "description": "Total TCP connection reset (RST) packets observed",
+        "rank": 36
+      },
+      {
+        "feature_name": "rst_ratio",
+        "feature_index": 19,
+        "mean_abs_shap": 0.0,
+        "unit": "ratio",
+        "description": "Proportion of flows terminated abnormally with RST flags",
+        "rank": 37
+      }
+    ]
+  },
+  "horizon_comparison_matrix": [
+    {
+      "feature_name": "unique_source_ips",
+      "feature_index": 20,
+      "unit": "count",
+      "description": "Count of unique source IP addresses active in window",
+      "overall_mean_abs_shap": 0.70918,
+      "shap_5m": 0.65204,
+      "shap_15m": 1.53493,
+      "shap_30m": 0.43358,
+      "shap_60m": 0.21618
+    },
+    {
+      "feature_name": "packet_length_std",
+      "feature_index": 13,
+      "unit": "bytes",
+      "description": "Standard deviation of packet lengths in bytes",
+      "overall_mean_abs_shap": 0.41744,
+      "shap_5m": 0.15435,
+      "shap_15m": 0.42688,
+      "shap_30m": 0.41834,
+      "shap_60m": 0.67018
+    },
+    {
+      "feature_name": "entropy_dest_ports",
+      "feature_index": 27,
+      "unit": "bits",
+      "description": "Shannon entropy of destination port distribution",
+      "overall_mean_abs_shap": 0.35544,
+      "shap_5m": 0.04903,
+      "shap_15m": 0.01934,
+      "shap_30m": 0.68289,
+      "shap_60m": 0.67051
+    },
+    {
+      "feature_name": "flow_volume",
+      "feature_index": 0,
+      "unit": "flows/window",
+      "description": "Total distinct network bidirectional flows active in observation window",
+      "overall_mean_abs_shap": 0.29158,
+      "shap_5m": 0.14547,
+      "shap_15m": 0.69945,
+      "shap_30m": 0.2853,
+      "shap_60m": 0.0361
+    },
+    {
+      "feature_name": "entropy_source_ips",
+      "feature_index": 24,
+      "unit": "bits",
+      "description": "Shannon entropy of source IP distribution: H(X) = -sum(p * log2(p))",
+      "overall_mean_abs_shap": 0.21946,
+      "shap_5m": 0.02428,
+      "shap_15m": 0.0366,
+      "shap_30m": 0.49415,
+      "shap_60m": 0.32281
+    },
+    {
+      "feature_name": "packet_volume",
+      "feature_index": 1,
+      "unit": "packets/window",
+      "description": "Total aggregate packet count across all flows in observation window",
+      "overall_mean_abs_shap": 0.21428,
+      "shap_5m": 0.07244,
+      "shap_15m": 0.39978,
+      "shap_30m": 0.26693,
+      "shap_60m": 0.11798
+    },
+    {
+      "feature_name": "byte_volume",
+      "feature_index": 2,
+      "unit": "bytes/window",
+      "description": "Total aggregate payload and header bytes transferred in observation window",
+      "overall_mean_abs_shap": 0.19784,
+      "shap_5m": 0.05228,
+      "shap_15m": 0.11528,
+      "shap_30m": 0.33345,
+      "shap_60m": 0.29034
+    },
+    {
+      "feature_name": "mean_packet_length",
+      "feature_index": 12,
+      "unit": "bytes/packet",
+      "description": "Mean packet length in bytes across all flows in the window",
+      "overall_mean_abs_shap": 0.16271,
+      "shap_5m": 0.0402,
+      "shap_15m": 0.13762,
+      "shap_30m": 0.31388,
+      "shap_60m": 0.15913
+    },
+    {
+      "feature_name": "behavioral_anomaly_score",
+      "feature_index": 36,
+      "unit": "score [0.0, 1.0]",
+      "description": "Unsupervised Isolation Forest perimeter deviation score relative to nominal traffic",
+      "overall_mean_abs_shap": 0.15235,
+      "shap_5m": 0.05153,
+      "shap_15m": 0.13299,
+      "shap_30m": 0.24137,
+      "shap_60m": 0.1835
+    },
+    {
+      "feature_name": "ack_count",
+      "feature_index": 16,
+      "unit": "packets",
+      "description": "Total TCP packets with ACK flag set in observation window",
+      "overall_mean_abs_shap": 0.14963,
+      "shap_5m": 0.00884,
+      "shap_15m": 0.1088,
+      "shap_30m": 0.25505,
+      "shap_60m": 0.22584
+    },
+    {
+      "feature_name": "syn_count",
+      "feature_index": 14,
+      "unit": "packets",
+      "description": "Total TCP packets with SYN flag set in observation window",
+      "overall_mean_abs_shap": 0.14226,
+      "shap_5m": 0.16811,
+      "shap_15m": 0.14536,
+      "shap_30m": 0.09803,
+      "shap_60m": 0.15755
+    },
+    {
+      "feature_name": "duration_variance",
+      "feature_index": 6,
+      "unit": "ms\u00b2",
+      "description": "Statistical variance of connection lifetimes across flows in the window",
+      "overall_mean_abs_shap": 0.14182,
+      "shap_5m": 0.06716,
+      "shap_15m": 0.03086,
+      "shap_30m": 0.30823,
+      "shap_60m": 0.16104
+    },
+    {
+      "feature_name": "entropy_dest_ips",
+      "feature_index": 25,
+      "unit": "bits",
+      "description": "Shannon entropy of destination IP distribution",
+      "overall_mean_abs_shap": 0.13547,
+      "shap_5m": 0.18305,
+      "shap_15m": 0.03073,
+      "shap_30m": 0.16673,
+      "shap_60m": 0.16137
+    },
+    {
+      "feature_name": "syn_ack_ratio",
+      "feature_index": 18,
+      "unit": "ratio",
+      "description": "Ratio of SYN packets to ACK packets; ratio > 1 indicates incomplete handshakes",
+      "overall_mean_abs_shap": 0.11718,
+      "shap_5m": 0.06087,
+      "shap_15m": 0.01021,
+      "shap_30m": 0.20599,
+      "shap_60m": 0.19164
+    },
+    {
+      "feature_name": "dest_concentration_delta",
+      "feature_index": 35,
+      "unit": "ratio",
+      "description": "Rate of change in traffic destination concentration ratio",
+      "overall_mean_abs_shap": 0.11046,
+      "shap_5m": 0.05361,
+      "shap_15m": 0.05458,
+      "shap_30m": 0.16899,
+      "shap_60m": 0.16468
+    },
+    {
+      "feature_name": "unique_destination_ports",
+      "feature_index": 23,
+      "unit": "count",
+      "description": "Count of unique destination service ports accessed",
+      "overall_mean_abs_shap": 0.09971,
+      "shap_5m": 0.001,
+      "shap_15m": 0.00496,
+      "shap_30m": 0.11827,
+      "shap_60m": 0.27461
+    },
+    {
+      "feature_name": "entropy_change_src_ips",
+      "feature_index": 32,
+      "unit": "bits",
+      "description": "Rate of change in source IP entropy across temporal windows",
+      "overall_mean_abs_shap": 0.08047,
+      "shap_5m": 0.01557,
+      "shap_15m": 0.10175,
+      "shap_30m": 0.11659,
+      "shap_60m": 0.08797
+    },
+    {
+      "feature_name": "mean_flow_duration_ms",
+      "feature_index": 5,
+      "unit": "ms",
+      "description": "Average flow connection duration in milliseconds",
+      "overall_mean_abs_shap": 0.07892,
+      "shap_5m": 0.02484,
+      "shap_15m": 0.07043,
+      "shap_30m": 0.12378,
+      "shap_60m": 0.09662
+    },
+    {
+      "feature_name": "delta_byte_rate",
+      "feature_index": 30,
+      "unit": "bytes/s",
+      "description": "Step change in byte throughput relative to previous temporal window",
+      "overall_mean_abs_shap": 0.07788,
+      "shap_5m": 0.02324,
+      "shap_15m": 0.02729,
+      "shap_30m": 0.13414,
+      "shap_60m": 0.12684
+    },
+    {
+      "feature_name": "burst_score_delta",
+      "feature_index": 34,
+      "unit": "ratio",
+      "description": "Change in peak-to-mean traffic burstiness ratio across temporal windows",
+      "overall_mean_abs_shap": 0.06441,
+      "shap_5m": 0.05825,
+      "shap_15m": 0.01959,
+      "shap_30m": 0.09759,
+      "shap_60m": 0.08221
+    },
+    {
+      "feature_name": "entropy_change_dest_ports",
+      "feature_index": 31,
+      "unit": "bits",
+      "description": "Rate of change in destination port entropy across temporal windows",
+      "overall_mean_abs_shap": 0.06285,
+      "shap_5m": 0.01402,
+      "shap_15m": 0.02341,
+      "shap_30m": 0.1132,
+      "shap_60m": 0.10075
+    },
+    {
+      "feature_name": "delta_packet_rate",
+      "feature_index": 28,
+      "unit": "packets/s",
+      "description": "Step change in packet rate relative to previous temporal window",
+      "overall_mean_abs_shap": 0.05164,
+      "shap_5m": 0.00868,
+      "shap_15m": 0.05134,
+      "shap_30m": 0.07269,
+      "shap_60m": 0.07386
+    },
+    {
+      "feature_name": "syn_rate_acceleration",
+      "feature_index": 33,
+      "unit": "packets/s\u00b2",
+      "description": "Second derivative / acceleration of TCP SYN initiation rate",
+      "overall_mean_abs_shap": 0.04969,
+      "shap_5m": 0.04901,
+      "shap_15m": 0.02091,
+      "shap_30m": 0.06133,
+      "shap_60m": 0.06752
+    },
+    {
+      "feature_name": "packet_rate_slope",
+      "feature_index": 29,
+      "unit": "packets/s\u00b2",
+      "description": "First-order linear regression slope of packet rates over past k windows",
+      "overall_mean_abs_shap": 0.04704,
+      "shap_5m": 0.01553,
+      "shap_15m": 0.04447,
+      "shap_30m": 0.07903,
+      "shap_60m": 0.04913
+    },
+    {
+      "feature_name": "unique_source_ports",
+      "feature_index": 22,
+      "unit": "count",
+      "description": "Count of unique ephemeral source ports observed",
+      "overall_mean_abs_shap": 0.00395,
+      "shap_5m": 0.00371,
+      "shap_15m": 0.00043,
+      "shap_30m": 0.0062,
+      "shap_60m": 0.00546
+    },
+    {
+      "feature_name": "entropy_source_ports",
+      "feature_index": 26,
+      "unit": "bits",
+      "description": "Shannon entropy of source port distribution",
+      "overall_mean_abs_shap": 0.00176,
+      "shap_5m": 0.0,
+      "shap_15m": 0.00108,
+      "shap_30m": 0.0,
+      "shap_60m": 0.00595
+    },
+    {
+      "feature_name": "unique_destination_ips",
+      "feature_index": 21,
+      "unit": "count",
+      "description": "Count of unique destination IP addresses targeted in window",
+      "overall_mean_abs_shap": 0.00119,
+      "shap_5m": 0.0,
+      "shap_15m": 0.0,
+      "shap_30m": 0.00192,
+      "shap_60m": 0.00283
+    },
+    {
+      "feature_name": "packets_per_second",
+      "feature_index": 3,
+      "unit": "packets/s",
+      "description": "Mean packet transmission rate across the window duration",
+      "overall_mean_abs_shap": 0.0,
+      "shap_5m": 0.0,
+      "shap_15m": 0.0,
+      "shap_30m": 0.0,
+      "shap_60m": 0.0
+    },
+    {
+      "feature_name": "bytes_per_second",
+      "feature_index": 4,
+      "unit": "bytes/s",
+      "description": "Mean volumetric byte throughput across the window duration",
+      "overall_mean_abs_shap": 0.0,
+      "shap_5m": 0.0,
+      "shap_15m": 0.0,
+      "shap_30m": 0.0,
+      "shap_60m": 0.0
+    },
+    {
+      "feature_name": "forward_packets_total",
+      "feature_index": 7,
+      "unit": "packets",
+      "description": "Total client-to-server (forward) packets transmitted",
+      "overall_mean_abs_shap": 0.0,
+      "shap_5m": 0.0,
+      "shap_15m": 0.0,
+      "shap_30m": 0.0,
+      "shap_60m": 0.0
+    },
+    {
+      "feature_name": "backward_packets_total",
+      "feature_index": 8,
+      "unit": "packets",
+      "description": "Total server-to-client (backward) response packets transmitted",
+      "overall_mean_abs_shap": 0.0,
+      "shap_5m": 0.0,
+      "shap_15m": 0.0,
+      "shap_30m": 0.0,
+      "shap_60m": 0.0
+    },
+    {
+      "feature_name": "forward_bytes_total",
+      "feature_index": 9,
+      "unit": "bytes",
+      "description": "Total client-to-server outbound bytes transferred",
+      "overall_mean_abs_shap": 0.0,
+      "shap_5m": 0.0,
+      "shap_15m": 0.0,
+      "shap_30m": 0.0,
+      "shap_60m": 0.0
+    },
+    {
+      "feature_name": "backward_bytes_total",
+      "feature_index": 10,
+      "unit": "bytes",
+      "description": "Total server-to-client inbound response bytes transferred",
+      "overall_mean_abs_shap": 0.0,
+      "shap_5m": 0.0,
+      "shap_15m": 0.0,
+      "shap_30m": 0.0,
+      "shap_60m": 0.0
+    },
+    {
+      "feature_name": "forward_backward_ratio",
+      "feature_index": 11,
+      "unit": "ratio",
+      "description": "Ratio of forward to backward packets; high ratios indicate unidirectional traffic",
+      "overall_mean_abs_shap": 0.0,
+      "shap_5m": 0.0,
+      "shap_15m": 0.0,
+      "shap_30m": 0.0,
+      "shap_60m": 0.0
+    },
+    {
+      "feature_name": "syn_rate",
+      "feature_index": 15,
+      "unit": "packets/s",
+      "description": "Rate of TCP SYN packet initiation per second",
+      "overall_mean_abs_shap": 0.0,
+      "shap_5m": 0.0,
+      "shap_15m": 0.0,
+      "shap_30m": 0.0,
+      "shap_60m": 0.0
+    },
+    {
+      "feature_name": "rst_count",
+      "feature_index": 17,
+      "unit": "packets",
+      "description": "Total TCP connection reset (RST) packets observed",
+      "overall_mean_abs_shap": 0.0,
+      "shap_5m": 0.0,
+      "shap_15m": 0.0,
+      "shap_30m": 0.0,
+      "shap_60m": 0.0
+    },
+    {
+      "feature_name": "rst_ratio",
+      "feature_index": 19,
+      "unit": "ratio",
+      "description": "Proportion of flows terminated abnormally with RST flags",
+      "overall_mean_abs_shap": 0.0,
+      "shap_5m": 0.0,
+      "shap_15m": 0.0,
+      "shap_30m": 0.0,
+      "shap_60m": 0.0
+    }
+  ]
+}

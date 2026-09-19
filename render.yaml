@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: foresight-api
+    env: python
+    rootDir: backend
+    plan: standard
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python -m alembic upgrade head
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: foresight-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: BACKEND_CORS_ORIGINS
+        value: '["https://foresight-ai.vercel.app"]'
+      - key: LOG_LEVEL
+        value: INFO
+      - key: CONFORMAL_TARGET_COVERAGE
+        value: "0.90"
+
+databases:
+  - name: foresight-db
+    plan: standard
+    databaseName: foresight_db
+    user: foresight_admin

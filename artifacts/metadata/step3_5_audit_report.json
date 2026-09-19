@@ -1,0 +1,402 @@
+{
+  "audit_timestamp": "2026-09-18T15:52:14.665629+00:00",
+  "duration_seconds": 25.998,
+  "leakage_audit": {
+    "window_monotonicity_verified": true,
+    "train_val_temporal_boundary_isolated": true,
+    "val_test_temporal_boundary_isolated": true,
+    "max_train_timestamp": "2026-09-18T16:48:01.456526+00:00",
+    "min_val_timestamp": "2026-09-18T16:48:31.456526+00:00",
+    "max_val_timestamp": "2026-09-18T20:24:31.456526+00:00",
+    "min_test_timestamp": "2026-09-18T20:25:01.456526+00:00",
+    "rolling_history_strictly_causal": true,
+    "leakage_status": "PASSED_ZERO_LEAKAGE"
+  },
+  "class_distribution_audit": {
+    "5m": {
+      "horizon_minutes": 5,
+      "total_samples": 2880,
+      "total_positive_count": 60,
+      "total_negative_count": 2820,
+      "total_positive_rate": 0.0208,
+      "train": {
+        "positive_count": 40,
+        "negative_count": 1975,
+        "positive_rate": 0.0199
+      },
+      "validation": {
+        "positive_count": 10,
+        "negative_count": 423,
+        "positive_rate": 0.0231
+      },
+      "held_out_test": {
+        "positive_count": 10,
+        "negative_count": 422,
+        "positive_rate": 0.0231
+      }
+    },
+    "15m": {
+      "horizon_minutes": 15,
+      "total_samples": 2880,
+      "total_positive_count": 180,
+      "total_negative_count": 2700,
+      "total_positive_rate": 0.0625,
+      "train": {
+        "positive_count": 120,
+        "negative_count": 1895,
+        "positive_rate": 0.0596
+      },
+      "validation": {
+        "positive_count": 30,
+        "negative_count": 403,
+        "positive_rate": 0.0693
+      },
+      "held_out_test": {
+        "positive_count": 30,
+        "negative_count": 402,
+        "positive_rate": 0.0694
+      }
+    },
+    "30m": {
+      "horizon_minutes": 30,
+      "total_samples": 2880,
+      "total_positive_count": 360,
+      "total_negative_count": 2520,
+      "total_positive_rate": 0.125,
+      "train": {
+        "positive_count": 240,
+        "negative_count": 1775,
+        "positive_rate": 0.1191
+      },
+      "validation": {
+        "positive_count": 60,
+        "negative_count": 373,
+        "positive_rate": 0.1386
+      },
+      "held_out_test": {
+        "positive_count": 60,
+        "negative_count": 372,
+        "positive_rate": 0.1389
+      }
+    },
+    "60m": {
+      "horizon_minutes": 60,
+      "total_samples": 2880,
+      "total_positive_count": 720,
+      "total_negative_count": 2160,
+      "total_positive_rate": 0.25,
+      "train": {
+        "positive_count": 480,
+        "negative_count": 1535,
+        "positive_rate": 0.2382
+      },
+      "validation": {
+        "positive_count": 120,
+        "negative_count": 313,
+        "positive_rate": 0.2771
+      },
+      "held_out_test": {
+        "positive_count": 120,
+        "negative_count": 312,
+        "positive_rate": 0.2778
+      }
+    }
+  },
+  "validation_metrics": {
+    "5": {
+      "horizon_minutes": 5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.3438,
+      "roc_auc": 0.974,
+      "brier_score": 0.0218,
+      "expected_calibration_error": 0.0017,
+      "confusion_matrix": [
+        [
+          423,
+          0
+        ],
+        [
+          10,
+          0
+        ]
+      ],
+      "optimal_threshold": 0.5
+    },
+    "15": {
+      "horizon_minutes": 15,
+      "precision": 1.0,
+      "recall": 0.9667,
+      "f1": 0.9831,
+      "pr_auc": 0.9871,
+      "roc_auc": 0.9984,
+      "brier_score": 0.0068,
+      "expected_calibration_error": 0.0273,
+      "confusion_matrix": [
+        [
+          403,
+          0
+        ],
+        [
+          1,
+          29
+        ]
+      ],
+      "optimal_threshold": 0.44
+    },
+    "30": {
+      "horizon_minutes": 30,
+      "precision": 1.0,
+      "recall": 0.45,
+      "f1": 0.6207,
+      "pr_auc": 0.65,
+      "roc_auc": 0.8134,
+      "brier_score": 0.0732,
+      "expected_calibration_error": 0.0284,
+      "confusion_matrix": [
+        [
+          373,
+          0
+        ],
+        [
+          33,
+          27
+        ]
+      ],
+      "optimal_threshold": 0.68
+    },
+    "60": {
+      "horizon_minutes": 60,
+      "precision": 0.379,
+      "recall": 0.7833,
+      "f1": 0.5109,
+      "pr_auc": 0.5727,
+      "roc_auc": 0.7272,
+      "brier_score": 0.1677,
+      "expected_calibration_error": 0.0456,
+      "confusion_matrix": [
+        [
+          159,
+          154
+        ],
+        [
+          26,
+          94
+        ]
+      ],
+      "optimal_threshold": 0.2
+    }
+  },
+  "held_out_test_metrics": {
+    "5": {
+      "horizon_minutes": 5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.2571,
+      "roc_auc": 0.8915,
+      "brier_score": 0.0222,
+      "expected_calibration_error": 0.0025,
+      "confusion_matrix": [
+        [
+          422,
+          0
+        ],
+        [
+          10,
+          0
+        ]
+      ],
+      "threshold": 0.5
+    },
+    "15": {
+      "horizon_minutes": 15,
+      "precision": 0.9643,
+      "recall": 0.9,
+      "f1": 0.931,
+      "pr_auc": 0.9325,
+      "roc_auc": 0.9479,
+      "brier_score": 0.0112,
+      "expected_calibration_error": 0.0231,
+      "confusion_matrix": [
+        [
+          401,
+          1
+        ],
+        [
+          3,
+          27
+        ]
+      ],
+      "threshold": 0.44
+    },
+    "30": {
+      "horizon_minutes": 30,
+      "precision": 0.9643,
+      "recall": 0.45,
+      "f1": 0.6136,
+      "pr_auc": 0.5752,
+      "roc_auc": 0.7283,
+      "brier_score": 0.08,
+      "expected_calibration_error": 0.0391,
+      "confusion_matrix": [
+        [
+          371,
+          1
+        ],
+        [
+          33,
+          27
+        ]
+      ],
+      "threshold": 0.68
+    },
+    "60": {
+      "horizon_minutes": 60,
+      "precision": 0.3043,
+      "recall": 0.6417,
+      "f1": 0.4129,
+      "pr_auc": 0.5413,
+      "roc_auc": 0.6485,
+      "brier_score": 0.1785,
+      "expected_calibration_error": 0.1066,
+      "confusion_matrix": [
+        [
+          136,
+          176
+        ],
+        [
+          43,
+          77
+        ]
+      ],
+      "threshold": 0.2
+    }
+  },
+  "baseline_reproduction_15m": {
+    "majority_dummy": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "pr_auc": 0.0694,
+      "roc_auc": 0.5,
+      "brier_score": 0.0694,
+      "per_sample_inference_latency_ms": 0.0014
+    },
+    "logistic_regression": {
+      "precision": 0.7179,
+      "recall": 0.9333,
+      "f1": 0.8116,
+      "pr_auc": 0.9629,
+      "roc_auc": 0.9918,
+      "brier_score": 0.0224,
+      "per_sample_inference_latency_ms": 0.0028
+    },
+    "random_forest": {
+      "precision": 0.9,
+      "recall": 0.9,
+      "f1": 0.9,
+      "pr_auc": 0.9338,
+      "roc_auc": 0.955,
+      "brier_score": 0.0098,
+      "per_sample_inference_latency_ms": 0.0203
+    },
+    "hist_gbm_platt": {
+      "precision": 0.931,
+      "recall": 0.9,
+      "f1": 0.9153,
+      "pr_auc": 0.9508,
+      "roc_auc": 0.9777,
+      "brier_score": 0.0122,
+      "per_sample_inference_latency_ms": 0.0096
+    }
+  },
+  "horizon_diagnosis": {
+    "5m_diagnosis": {
+      "root_cause": "Extreme class imbalance (2.08% positive base rate) causes Platt Sigmoid to compress output probabilities to [0.021, 0.135]. Default threshold of 0.50 yields zero positive predictions despite strong ranking (ROC-AUC=0.8915).",
+      "val_calibrated_prob_min": 0.0216,
+      "val_calibrated_prob_max": 0.1343,
+      "val_calibrated_prob_mean": 0.0231,
+      "remedy_for_step_4": "Implement adaptive percentile thresholding and Beta calibration for extreme imbalanced horizons in Step 4."
+    },
+    "60m_calibration_diagnosis": {
+      "root_cause": "Temporal signal decay over long 60-minute forward lookahead reduces certainty, increasing dispersion and yielding ECE=10.66%.",
+      "held_out_brier_score": 0.1785,
+      "held_out_ece": 0.1066,
+      "reliability_diagram_bins": [
+        {
+          "bin_range": "[0.0, 0.2)",
+          "sample_count": 179,
+          "observed_frequency": 0.2402,
+          "mean_confidence": 0.1561
+        },
+        {
+          "bin_range": "[0.2, 0.4)",
+          "sample_count": 173,
+          "observed_frequency": 0.2081,
+          "mean_confidence": 0.2883
+        },
+        {
+          "bin_range": "[0.4, 0.6)",
+          "sample_count": 52,
+          "observed_frequency": 0.2692,
+          "mean_confidence": 0.4691
+        },
+        {
+          "bin_range": "[0.6, 0.8)",
+          "sample_count": 28,
+          "observed_frequency": 0.9643,
+          "mean_confidence": 0.7238
+        },
+        {
+          "bin_range": "[0.8, 1.0)",
+          "sample_count": 0,
+          "observed_frequency": 0.0,
+          "mean_confidence": 0.9
+        }
+      ],
+      "remedy_for_step_4": "Step 4 will incorporate Conformal Prediction sets and Isotonic Recalibration to bound 60m uncertainty."
+    }
+  },
+  "lead_time_audit": {
+    "evaluation_protocol": "Strict test partition only. Matched when forecast issued at t_f with t_f < t_attack <= t_f + 15m.",
+    "test_attacks_in_scope": 1,
+    "matched_early_warnings_count": 27,
+    "mean_lead_time_minutes": 7.44,
+    "min_lead_time_minutes": 0.48,
+    "max_lead_time_minutes": 13.98,
+    "is_empirically_reproducible": true,
+    "sample_matched_records": [
+      {
+        "forecast_timestamp": "2026-09-18T21:46:01.456526+00:00",
+        "attack_timestamp": "2026-09-18T22:00:00+00:00",
+        "threat": "Data Exfiltration",
+        "calibrated_probability": 0.8063,
+        "lead_time_minutes": 13.98
+      },
+      {
+        "forecast_timestamp": "2026-09-18T21:46:31.456526+00:00",
+        "attack_timestamp": "2026-09-18T22:00:00+00:00",
+        "threat": "Data Exfiltration",
+        "calibrated_probability": 0.8064,
+        "lead_time_minutes": 13.48
+      },
+      {
+        "forecast_timestamp": "2026-09-18T21:47:01.456526+00:00",
+        "attack_timestamp": "2026-09-18T22:00:00+00:00",
+        "threat": "Data Exfiltration",
+        "calibrated_probability": 0.8064,
+        "lead_time_minutes": 12.98
+      }
+    ]
+  },
+  "latency_benchmark": {
+    "temporal_derivative_extraction_ms": 0.055,
+    "anomaly_detector_scoring_ms": 12.339,
+    "single_horizon_model_inference_ms": 3.003,
+    "platt_sigmoid_calibration_ms": 0.159,
+    "complete_4_horizon_e2e_forecast_ms": 25.044
+  },
+  "readiness_for_step_4": true
+}
